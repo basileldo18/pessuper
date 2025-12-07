@@ -51,7 +51,7 @@ if (window.leagueDataBackend) {
 
 
 // --- DATA STATE & CURRENT SEASON ---
-let currentSeason = 'season1';
+let currentSeason = 'season2';
 
 // --- LOGIC FUNCTIONS ---
 
@@ -102,6 +102,11 @@ const renderPointsTable = (season) => {
             const className = result === 'W' ? 'form-win' : result === 'D' ? 'form-draw' : 'form-loss';
             return `<span class="${className}">${result}</span>`;
         }).join('');
+
+        if (season === 'season2') {
+            if (index === 0) row.classList.add('row-final');
+            if (index === 1 || index === 2) row.classList.add('row-semi');
+        }
 
         row.innerHTML = `
             <td>${index + 1}</td>
@@ -341,14 +346,23 @@ const initializeSite = () => {
         });
     });
 
-    // Initial setup for Season 1
+    // Initial setup for Season 2
+    renderPointsTable('season2');
+    renderFixtures('season2');
+    renderTopScorers('season2');
+
+    // Also render Season 1 so it's ready when switched
     renderPointsTable('season1');
     renderFixtures('season1');
     renderTopScorers('season1');
 
-    // Ensure Season 2 content is hidden initially
+    // Ensure Season 1 content is hidden initially
+    const s1Data = document.getElementById('season1-data');
+    if (s1Data) s1Data.classList.add('hidden');
+
+    // Ensure Season 2 content is visible default
     const s2Data = document.getElementById('season2-data');
-    if (s2Data) s2Data.classList.add('hidden');
+    if (s2Data) s2Data.classList.remove('hidden');
 
     // Set initial active content tab (League Table)
     switchContentSection('points-table-section');

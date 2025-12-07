@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Team - PES Super League</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #f8f9fc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .auth-card h2 {
+            margin-bottom: 10px;
+            color: #1e293b;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #64748b;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: #4361ee;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: #4361ee;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #3f37c9;
+        }
+
+        .auth-links {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .auth-links a {
+            color: #4361ee;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .flash {
+            padding: 10px;
+            background: #fee2e2;
+            color: #dc2626;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .warning-text {
+            font-size: 0.8rem;
+            color: #f59e0b;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-card">
+        <h2>Register Team</h2>
+        <p class="subtitle">Join the league dashboard. Approval required.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash" style="{{ 'background:#dcfce7; color:#166534;' if category == 'success' else '' }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('team_register') }}" method="POST">
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label>Team Name (Exact Spelling)</label>
+                <input type="text" name="team_name" placeholder="e.g. Manchester City" required>
+                <div class="warning-text">Make sure this matches the team name in the points table exactly.</div>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" required>
+            </div>
+            <button type="submit" class="btn-primary">Request Access</button>
+        </form>
+
+        <div class="auth-links">
+            Already registered? <a href="{{ url_for('team_login') }}">Login here</a>
+        </div>
+    </div>
+</body>
+
+</html>

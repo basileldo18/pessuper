@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, Response
 from datetime import timedelta
 from supabase import create_client, Client
 import pandas as pd
@@ -380,6 +380,18 @@ def admin():
                     if new_fixtures:
                         supabase.table('fixtures').insert(new_fixtures).execute()
                         flash(f"Generated {len(new_fixtures)} fixtures for {season}!", "success")
+            
+            elif action == 'approve_team_request':
+                request_id = request.form.get('request_id')
+                if request_id:
+                    supabase.table('team_requests').update({'status': 'approved'}).eq('id', request_id).execute()
+                    flash("Team request approved.", "success")
+            
+            elif action == 'decline_team_request':
+                request_id = request.form.get('request_id')
+                if request_id:
+                    supabase.table('team_requests').update({'status': 'declined'}).eq('id', request_id).execute()
+                    flash("Team request declined.", "success")
                 
         except Exception as e:
             flash(f"Error updating: {e}", "error")
@@ -402,10 +414,16 @@ def admin():
                 "fixtures": [f for f in all_fixtures if f['season'] == 'season2']
             }
         }
-    except:
-        data = {"season1": {"teams": [], "fixtures": []}, "season2": {"teams": [], "fixtures": []}}
         
-    return render_template('admin.html', user=session['user'], data=data)
+        # Fetch pending team requests
+        team_requests = supabase.table('team_requests').select('*').order('created_at', desc=True).execute().data
+        
+    except Exception as e: # Catch specific exceptions if possible, e.g., Supabase errors
+        data = {"season1": {"teams": [], "fixtures": []}, "season2": {"teams": [], "fixtures": []}}
+        team_requests = []
+        flash(f"Error fetching admin data: {e}", "error")
+        
+    return render_template('admin.html', user=session['user'], data=data, team_requests=team_requests)
 
 @app.route('/download_fixtures/<season>')
 def download_fixtures(season):
@@ -440,6 +458,210 @@ def download_fixtures(season):
         
     return Response(pdf.output(dest='S').encode('latin-1'), mimetype='application/pdf', headers={'Content-Disposition':f'attachment;filename=fixtures_{season}.pdf'})
 
+# --- Team Authentication & Dashboard ---
+from werkzeug.security import generate_password_hash, check_password_hash
+
+@app.route('/team/register', methods=['GET', 'POST'])
+def team_register():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        team_name = request.form.get('team_name')
+        password = request.form.get('password')
+        
+        if not email or not team_name or not password:
+            flash("All fields are required", "error")
+            return redirect(url_for('team_register'))
+            
+        # Check if team exists in Season 2 (Validation)
+        # We allow registration only if team exists in teams table (case insensitive check recommended but strict here for now)
+        try:
+            team_exists = supabase.table('teams').select('id').eq('name', team_name).eq('season', 'season2').execute().data
+            if not team_exists:
+                flash(f"Team '{team_name}' not found in Season 2. Please check spelling.", "error")
+                return redirect(url_for('team_register'))
+                
+            # Insert into team_requests table
+            # NOTE: User must create this table in Supabase: 
+            # create table team_requests (id uuid default gen_random_uuid() primary key, email text, password text, team_name text, status text default 'pending', created_at timestamptz default now());
+            
+            # Check if email already registered
+            existing_user = supabase.table('team_requests').select('id').eq('email', email).execute().data
+            if existing_user:
+                flash("Email already registered (or pending approval).", "error")
+                return redirect(url_for('team_login'))
+
+            hashed_pw = generate_password_hash(password)
+            
+            supabase.table('team_requests').insert({
+                'email': email,
+                'team_name': team_name,
+                'password': hashed_pw,
+                'status': 'pending'
+            }).execute()
+            
+            flash("Registration successful! Please wait for Admin approval.", "success")
+            return redirect(url_for('team_login'))
+            
+        except Exception as e:
+            flash(f"Error: {str(e)}. (Ensure 'team_requests' table exists)", "error")
+            return redirect(url_for('team_register'))
+
+    return render_template('register.html')
+
+@app.route('/team/login', methods=['GET', 'POST'])
+def team_login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        try:
+            # Check custom table
+            user_record = supabase.table('team_requests').select('*').eq('email', email).execute().data
+            
+            if not user_record:
+                flash("Invalid credentials or user not found.", "error")
+                return redirect(url_for('team_login'))
+            
+            user = user_record[0]
+            
+            if user['status'] == 'pending':
+                flash("Account is pending approval. Please contact Admin.", "error")
+                return redirect(url_for('team_login'))
+            elif user['status'] == 'declined':
+                 flash("Account registration was declined.", "error")
+                 return redirect(url_for('team_login'))
+                 
+            if check_password_hash(user['password'], password):
+                # Login Success
+                session['team_user'] = user['email']
+                session['team_name'] = user['team_name']
+                return redirect(url_for('team_dashboard'))
+            else:
+                flash("Invalid password.", "error")
+                return redirect(url_for('team_login'))
+                
+        except Exception as e:
+            flash(f"Login error: {str(e)}", "error")
+            
+    return render_template('team_login.html')
+
+@app.route('/team/dashboard')
+def team_dashboard():
+    if 'team_user' not in session:
+        return redirect(url_for('team_login'))
+    
+    team_name = session.get('team_name')
+    
+    # Reuse the logic from team_analysis but strictly for this team
+    try:
+        team_data = supabase.table('teams').select('*').eq('name', team_name).eq('season', 'season2').single().execute().data
+        if not team_data:
+            return f"Error: Team '{team_name}' data not found. Please contact admin."
+            
+        # Redirect to the analysis view logic using ID
+        return team_analysis(team_data['id'])
+        
+    except Exception as e:
+        return f"Error loading dashboard: {e}"
+
+# Modified to be public or admin only? 
+# The user asked for "Team Analysis" button to lead to login. 
+# So '/analysis_list' is effectively replaced or guarded.
+@app.route('/analysis_list') 
+def analysis_list():
+    # If already logged in as team, go to dashboard
+    if 'team_user' in session:
+        return redirect(url_for('team_dashboard'))
+    # Else go to login choice
+    return redirect(url_for('team_login'))
+
+@app.route('/analysis')
+def analysis_list_old(): # Renamed to avoid conflict with new analysis_list
+    if not supabase:
+        flash("Database connection failed", "error")
+        return redirect(url_for('landing'))
+    
+    # Fetch all teams from Season 2
+    teams = supabase.table('teams').select('*').eq('season', 'season2').order('name').execute().data
+    return render_template('analysis_list.html', teams=teams)
+
+@app.route('/analysis/<int:team_id>')
+def team_analysis(team_id):
+    if not supabase: return redirect(url_for('landing'))
+    
+    # 1. Get Team Details
+    team = supabase.table('teams').select('*').eq('id', team_id).single().execute().data
+    if not team:
+        flash("Team not found", "error")
+        return redirect(url_for('analysis_list'))
+        
+    team_name = team['name']
+    season = team['season']
+    
+    # 2. Get All Fixtures for this team
+    # Supabase "or" syntax is a bit specific: .or_(f"home_team.eq.{team_name},away_team.eq.{team_name}")
+    # But filtering by season first is good.
+    # We will fetch all season fixtures and filter in python for simplicity and reliability with complex OR queries
+    all_season_fixtures = supabase.table('fixtures').select('*').eq('season', season).execute().data
+    
+    team_fixtures = [f for f in all_season_fixtures if f['home_team'] == team_name or f['away_team'] == team_name]
+    
+    # 3. Analyze Fixtures
+    completed_matches = [f for f in team_fixtures if f['status'] == 'Completed']
+    remaining_matches = [f for f in team_fixtures if f['status'] != 'Completed']
+    
+    matches_played = len(completed_matches)
+    matches_remaining = len(remaining_matches)
+    current_points = team['points']
+    max_possible_points = current_points + (matches_remaining * 3)
+    
+    # 4. Head-to-Head Analysis
+    # Dictionary: opponent_name -> {played: 0, remaining: 0, results: []}
+    h2h = {}
+    
+    # Get all other teams to initialize
+    all_teams = supabase.table('teams').select('name').eq('season', season).execute().data
+    for t in all_teams:
+        if t['name'] != team_name:
+            h2h[t['name']] = {'played': 0, 'remaining': 0, 'results': []}
+            
+    for f in team_fixtures:
+        opponent = f['away_team'] if f['home_team'] == team_name else f['home_team']
+        
+        if opponent not in h2h: continue # Should not happen if data is consistent
+        
+        if f['status'] == 'Completed':
+            h2h[opponent]['played'] += 1
+            
+            # Determine Result
+            if f['home_team'] == team_name:
+                h_score, a_score = f['home_score'], f['away_score']
+                res = 'W' if h_score > a_score else 'L' if a_score > h_score else 'D'
+            else:
+                h_score, a_score = f['home_score'], f['away_score']
+                res = 'W' if a_score > h_score else 'L' if h_score > a_score else 'D'
+            
+            h2h[opponent]['results'].append(res)
+        else:
+            h2h[opponent]['remaining'] += 1
+
+    # 5. League Context (To see position)
+    standings = supabase.table('teams').select('*').eq('season', season).order('points', desc=True).execute().data
+    current_rank = next((i for i, t in enumerate(standings, 1) if t['id'] == team['id']), '-')
+    leader_points = standings[0]['points'] if standings else 0
+    points_to_leader = leader_points - current_points
+    
+    return render_template('analysis_detail.html', 
+                         team=team,
+                         matches_played=matches_played,
+                         matches_remaining=matches_remaining,
+                         max_possible_points=max_possible_points,
+                         h2h=h2h,
+                         remaining_matches=remaining_matches,
+                         current_rank=current_rank,
+                         leader_points=leader_points,
+                         points_to_leader=points_to_leader)
+
 @app.route('/logout')
 def logout():
     if 'access_token' in session:
@@ -447,7 +669,7 @@ def logout():
             supabase.auth.sign_out()
         except:
             pass
-    session.clear()
+    session.clear() # Clears both admin and team sessions
     return redirect(url_for('landing'))
 
 if __name__ == '__main__':

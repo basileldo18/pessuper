@@ -14,8 +14,8 @@
     <header class="header">
         <h1>PES <span>SUPER</span> LEAGUE 🏆</h1>
         <div class="season-tabs">
-            <button class="season-button active" data-season="season1">Season 1</button>
-            <button class="season-button" data-season="season2">Season 2 (Upcoming)</button>
+            <button class="season-button active" data-season="season2">Season 2</button>
+            <button class="season-button" data-season="season1">Season 1</button>
         </div>
         <nav class="nav">
             <button class="nav-button active" data-target="points-table-section">League Table</button>
@@ -32,7 +32,8 @@
     <main class="container">
 
         <!-- SEASON 1 DATA -->
-        <div id="season1-data">
+        <!-- SEASON 1 DATA -->
+        <div id="season1-data" class="hidden">
             <!-- Points Table -->
             <section id="points-table-section" class="content-section active">
                 <div id="season1-champion-banner" class="champion-banner hidden">
@@ -78,10 +79,21 @@
         </div>
 
         <!-- SEASON 2 DATA -->
-        <div id="season2-data" class="hidden">
+        <div id="season2-data">
             <section id="points-table-section-s2" class="content-section active">
                 <h2>League Standings - Season 2</h2>
                 <div class="table-container">
+                    <div class="qualification-legend"
+                        style="padding: 15px; border-bottom: 1px solid #eee; background: #fafafa;">
+                        <div class="legend-item">
+                            <span class="legend-color bg-final"></span>
+                            <span>1st Place: Direct Final 🏆</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color bg-semi"></span>
+                            <span>2nd & 3rd: Semi-Final Qualifier ⚔️</span>
+                        </div>
+                    </div>
                     <table id="points-table-s2" class="points-table">
                         <thead>
                             <tr>

@@ -558,8 +558,8 @@
                 <p style="color: var(--text-muted);">Manage teams, points, and match results.</p>
             </div>
             <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('season1')">Season 1</button>
-                <button class="tab-btn" onclick="switchTab('season2')">Season 2</button>
+                <button class="tab-btn active" onclick="switchTab('season2')">Season 2</button>
+                <button class="tab-btn" onclick="switchTab('season1')">Season 1</button>
             </div>
         </div>
 
@@ -576,8 +576,55 @@
             {% endwith %}
         </div>
 
+        {% if team_requests and team_requests|length > 0 %}
+        <div class="card" style="margin-bottom: 20px; border-left: 5px solid #f59e0b;">
+            <div class="card-header" style="border-bottom: none; margin-bottom: 0px; padding-bottom: 0px;">
+                <div class="card-title"><i class="fas fa-bell" style="color:#f59e0b;"></i> Pending Team Approvals</div>
+            </div>
+            <div class="table-responsive" style="margin-top: 15px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Team Name</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in team_requests %}
+                        {% if req.status == 'pending' %}
+                        <tr>
+                            <td style="font-weight: 600;">{{ req.team_name }}</td>
+                            <td>{{ req.email }}</td>
+                            <td><span
+                                    style="background: #fef3c7; color: #d97706; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 0.85rem;">Pending</span>
+                            </td>
+                            <td>
+                                <form action="{{ url_for('admin') }}" method="POST" style="display:inline;">
+                                    <input type="hidden" name="action" value="approve_team_request">
+                                    <input type="hidden" name="request_id" value="{{ req.id }}">
+                                    <button type="submit"
+                                        style="background:#10b981; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:600; margin-right:5px;">Accept</button>
+                                </form>
+                                <form action="{{ url_for('admin') }}" method="POST" style="display:inline;">
+                                    <input type="hidden" name="action" value="decline_team_request">
+                                    <input type="hidden" name="request_id" value="{{ req.id }}">
+                                    <button type="submit"
+                                        style="background:#ef4444; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:600;">Decline</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
         <!-- === SEASON 1 CONTENT === -->
-        <div id="season1-content" class="season-view">
+        <div id="season1-content" class="season-view" style="display: none;">
             <div class="grid-dashboard">
                 <!-- Left Column: Points Table -->
                 <div class="card">
@@ -728,7 +775,7 @@
         </div>
 
         <!-- === SEASON 2 CONTENT === -->
-        <div id="season2-content" class="season-view" style="display: none;">
+        <div id="season2-content" class="season-view">
 
             <!-- Tools Section for S2 -->
             <div class="card tools-card" style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
