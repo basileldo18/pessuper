@@ -1,0 +1,696 @@
+/* Import Google Fonts - Using Montserrat (Modern/Header) and Poppins (Body/Clean) */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* General Styling */
+:root {
+    /* Updated Professional Palette */
+    --primary-color: #007bff;
+    /* Bright Blue (Professional/Modern) */
+    --secondary-color: #f8f9fa;
+    /* Light Gray/Off White */
+    --text-color: #212529;
+    /* Dark Gray */
+    --header-bg: #001f4c;
+    /* Very Dark Blue */
+    --header-text: #ffffff;
+    --accent-color: #ffc107;
+    /* Gold/Yellow (for accent/active states) */
+    --win-color: #28a745;
+    /* Green */
+    --draw-color: #ffc107;
+    /* Yellow */
+    --loss-color: #dc3545;
+    /* Red */
+    --border-color: #e9ecef;
+    --shadow-color-light: rgba(0, 0, 0, 0.1);
+    --shadow-color-dark: rgba(0, 0, 0, 0.35);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', Arial, sans-serif;
+}
+
+body {
+    background: var(--secondary-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    font-size: 16px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    width: 95%;
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0;
+    background: transparent;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px var(--shadow-color-light);
+    animation: fadeInUp 0.8s ease forwards;
+    overflow: hidden;
+}
+
+/* Header and Navigation */
+.header {
+    background-color: var(--header-bg);
+    color: var(--header-text);
+    padding: 25px 0 15px;
+    text-align: center;
+    box-shadow: 0 5px 20px var(--shadow-color-dark);
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 1px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header h1 {
+    font-size: 2.8rem;
+    font-weight: 900;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    margin-bottom: 5px;
+    letter-spacing: 2px;
+}
+
+.header h1 span {
+    color: var(--accent-color);
+}
+
+/* New Season Tabs Container */
+.season-tabs {
+    display: flex;
+    justify-content: center;
+    margin: 15px 0;
+    padding: 0 10px;
+    gap: 10px;
+}
+
+.season-button {
+    background: var(--header-bg);
+    color: rgba(255, 255, 255, 0.7);
+    border: 2px solid var(--primary-color);
+    padding: 8px 20px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.season-button.active {
+    background-color: var(--primary-color);
+    color: var(--header-text);
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+/* Main Navigation Tabs */
+.nav {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.nav-button {
+    background: transparent;
+    border: none;
+    color: var(--header-text);
+    padding: 10px 22px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    border-radius: 5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+}
+
+.nav-button:hover {
+    color: var(--accent-color);
+}
+
+.nav-button.active {
+    color: var(--accent-color);
+}
+
+.nav-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 4px;
+    background-color: var(--accent-color);
+    border-radius: 2px;
+}
+
+/* Section Styling */
+.content-section {
+    padding: 30px 20px 40px;
+    background-color: #ffffff;
+    border-radius: 0 0 15px 15px;
+    box-shadow: 0 8px 25px var(--shadow-color-light);
+    opacity: 0;
+    animation: fadeIn 0.6s ease forwards;
+    border-top: 5px solid var(--primary-color);
+}
+
+.content-section.active {
+    opacity: 1;
+    animation-delay: 0.1s;
+}
+
+h2 {
+    text-align: center;
+    color: var(--primary-color);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid var(--border-color);
+    display: inline-block;
+    margin-left: 50%;
+    transform: translateX(-50%);
+}
+
+.hidden {
+    display: none;
+}
+
+/* CHAMPION BANNER */
+.champion-banner {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 10px;
+    text-align: center;
+    font-family: 'Montserrat', sans-serif;
+    box-shadow: 0 4px 10px var(--shadow-color-light);
+    border: 2px solid #ff9800;
+}
+
+.champion-banner h3 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 5px;
+    color: var(--header-bg);
+    text-transform: uppercase;
+}
+
+.champion-banner p {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+
+/* Points Table Styling */
+.table-container {
+    overflow-x: auto;
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background-color: #fff;
+    box-shadow: 0 4px 15px var(--shadow-color-light);
+}
+
+/* Apply same styles to both Season 1 (#points-table) and Season 2 (#points-table-s2) */
+#points-table,
+#points-table-s2 {
+    width: 100%;
+    border-collapse: separate;
+    /* Use separate for border-radius on cells */
+    border-spacing: 0;
+    min-width: 650px;
+    font-size: 1rem;
+}
+
+#points-table th,
+#points-table-s2 th,
+#points-table td,
+#points-table-s2 td {
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid #eeeeee;
+}
+
+
+#points-table thead th,
+#points-table-s2 thead th {
+    background-color: var(--primary-color);
+    color: var(--header-text);
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    font-family: 'Montserrat', sans-serif;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+#points-table thead th:first-child,
+#points-table-s2 thead th:first-child {
+    border-top-left-radius: 10px;
+}
+
+#points-table thead th:last-child,
+#points-table-s2 thead th:last-child {
+    border-top-right-radius: 10px;
+}
+
+#points-table tbody tr:nth-child(even),
+#points-table-s2 tbody tr:nth-child(even) {
+    background-color: #f7f7f7;
+}
+
+#points-table tbody tr:hover,
+#points-table-s2 tbody tr:hover {
+    background-color: #e3f2fd;
+    transition: background-color 0.3s ease;
+}
+
+#points-table td:first-child,
+#points-table-s2 td:first-child {
+    font-weight: 700;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    background-color: #f0f8ff;
+}
+
+#points-table td:nth-child(2),
+#points-table-s2 td:nth-child(2) {
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-color);
+    font-family: 'Montserrat', sans-serif;
+}
+
+.points {
+    font-weight: 800;
+    font-size: 1.25rem;
+    background-color: var(--accent-color);
+    color: var(--header-bg);
+}
+
+/* Form column styling */
+.form-col {
+    white-space: nowrap;
+    letter-spacing: 0.1em;
+}
+
+.form-col span {
+    display: inline-flex;
+    width: 20px;
+    height: 20px;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: white;
+    border-radius: 50%;
+    margin-right: 3px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    text-transform: uppercase;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.form-win {
+    background-color: var(--win-color);
+}
+
+.form-draw {
+    background-color: var(--draw-color);
+    color: var(--text-color);
+}
+
+.form-loss {
+    background-color: var(--loss-color);
+}
+
+/* Fixtures Styling */
+
+#fixtures-list,
+#fixtures-list-s2 {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding: 0 10px;
+}
+
+#fixtures-list h3,
+#fixtures-list-s2 h3 {
+    text-align: left !important;
+    color: var(--primary-color) !important;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-top: 10px !important;
+    margin-bottom: -15px !important;
+    border-bottom: 3px solid var(--accent-color);
+    padding-bottom: 5px;
+    width: 100%;
+}
+
+.fixture-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    padding: 20px 25px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    font-weight: 600;
+    font-size: 1.1rem;
+    letter-spacing: 0.02em;
+    flex-wrap: wrap;
+    position: relative;
+}
+
+.fixture-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px var(--shadow-color-light);
+}
+
+.fixture-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background-color: var(--primary-color);
+    border-radius: 12px 0 0 12px;
+}
+
+.fixture-card.knockout::before {
+    background-color: var(--loss-color);
+    /* Red accent for knockout */
+}
+
+.fixture-card.completed::before {
+    background-color: var(--win-color);
+    /* Green accent for completed */
+}
+
+.match-details {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-grow: 1;
+    justify-content: center;
+    min-width: 300px;
+}
+
+.match-details .team-name {
+    font-weight: 800;
+    font-size: 1.3rem;
+    font-family: 'Montserrat', sans-serif;
+    white-space: nowrap;
+}
+
+.match-details .score-result {
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: var(--header-text);
+    padding: 5px 12px;
+    border: 2px solid var(--primary-color);
+    border-radius: 6px;
+    background-color: var(--primary-color);
+    flex-shrink: 0;
+}
+
+.match-details .vs-text {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #777;
+    text-transform: uppercase;
+}
+
+/* New Responsive Styles for Fixtures */
+.fixture-card .date-time,
+.fixture-card .stadium {
+    font-size: 0.95rem;
+    color: #757575;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.fixture-card .date-time {
+    order: 1;
+}
+
+.fixture-card .stadium {
+    order: 3;
+    text-align: right;
+}
+
+.fixture-card .match-details {
+    order: 2;
+    flex-basis: auto;
+}
+
+/* Top Goal Scorers Section Styling */
+#top-scorers-list,
+#top-scorers-list-s2 {
+    list-style: none;
+    padding: 0;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+#top-scorers-list li,
+#top-scorers-list-s2 li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    background-color: #f0f8ff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    font-size: 1.1rem;
+    font-weight: 500;
+    border-left: 5px solid var(--primary-color);
+}
+
+#top-scorers-list li:nth-child(1),
+#top-scorers-list-s2 li:nth-child(1) {
+    background-color: var(--accent-color);
+    border-left-color: #f1c40f;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--header-bg);
+    box-shadow: 0 4px 10px rgba(255, 193, 7, 0.5);
+}
+
+.scorer-rank {
+    font-weight: 900;
+    color: var(--primary-color);
+    font-family: 'Montserrat', sans-serif;
+    min-width: 30px;
+    text-align: left;
+}
+
+#top-scorers-list li:nth-child(1) .scorer-rank,
+#top-scorers-list-s2 li:nth-child(1) .scorer-rank {
+    color: var(--header-bg);
+}
+
+.scorer-goals {
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: var(--win-color);
+}
+
+/* --- Responsive Adjustments (Mobile - 600px and below) --- */
+
+@media (max-width: 900px) {
+    .header h1 {
+        font-size: 2.5rem;
+    }
+
+    .nav {
+        gap: 10px;
+    }
+
+    .nav-button {
+        padding: 8px 15px;
+        font-size: 1rem;
+    }
+
+    h2 {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 650px) {
+
+    /* Table Hide Columns */
+    #points-table th.stat:nth-child(5),
+    #points-table-s2 th.stat:nth-child(5),
+    /* D */
+    #points-table td.stat:nth-child(5),
+    #points-table-s2 td.stat:nth-child(5),
+
+    #points-table th.stat:nth-child(6),
+    #points-table-s2 th.stat:nth-child(6),
+    /* L */
+    #points-table td.stat:nth-child(6),
+    #points-table-s2 td.stat:nth-child(6),
+
+    #points-table th.stat:nth-child(7),
+    #points-table-s2 th.stat:nth-child(7),
+    /* GF */
+    #points-table td.stat:nth-child(7),
+    #points-table-s2 td.stat:nth-child(7),
+
+    #points-table th.stat:nth-child(8),
+    #points-table-s2 th.stat:nth-child(8),
+    /* GA */
+    #points-table td.stat:nth-child(8),
+    #points-table-s2 td.stat:nth-child(8),
+
+    #points-table th.stat:nth-child(11),
+    #points-table-s2 th.stat:nth-child(11),
+    /* Form */
+    #points-table td.stat:nth-child(11),
+    #points-table-s2 td.stat:nth-child(11) {
+        display: none;
+    }
+
+    /* General table cell adjustments for tightness */
+    #points-table th,
+    #points-table-s2 th,
+    #points-table td,
+    #points-table-s2 td {
+        padding: 10px 5px;
+        font-size: 0.8rem;
+    }
+
+    #points-table td:nth-child(2),
+    #points-table-s2 td:nth-child(2) {
+        padding-left: 8px;
+        max-width: 90px;
+        font-size: 0.9rem;
+    }
+
+    .points {
+        font-size: 1.1rem;
+        padding: 10px 5px !important;
+    }
+
+    .header h1 {
+        font-size: 2rem;
+    }
+
+    .season-button {
+        font-size: 0.9rem;
+        padding: 6px 15px;
+    }
+
+    .nav {
+        flex-wrap: wrap;
+        margin-top: 10px;
+    }
+
+    /* Fixture Card Mobile Stacking */
+    .fixture-card {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 15px;
+        gap: 5px;
+    }
+
+    .fixture-card .date-time,
+    .fixture-card .stadium {
+        text-align: center;
+        width: 100%;
+        order: 1;
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    .fixture-card .match-details {
+        order: 2;
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px 0;
+        border-top: 1px dashed var(--border-color);
+        border-bottom: 1px dashed var(--border-color);
+        min-width: 0;
+    }
+
+    .match-details .team-name {
+        font-size: 1.1rem;
+    }
+
+    .match-details .score-result {
+        font-size: 1.3rem;
+        padding: 3px 10px;
+    }
+
+    .fixture-card .stadium {
+        order: 3;
+        margin-top: 5px;
+        font-weight: 400;
+        color: #555;
+    }
+
+    .champion-banner h3 {
+        font-size: 1.5rem;
+    }
+
+    .champion-banner p {
+        font-size: 1rem;
+    }
+}
+
+
+/* Footer and Animations */
+.footer {
+    text-align: center;
+    padding: 20px 10px 30px;
+    margin-top: auto;
+    color: #757575;
+    font-size: 0.9rem;
+    font-family: 'Poppins', sans-serif;
+    background-color: #e9ecef;
+    border-top: 1px solid var(--border-color);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

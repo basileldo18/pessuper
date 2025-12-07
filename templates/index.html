@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PES Super League - Points & Fixtures</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <!-- Header / Branding -->
+    <header class="header">
+        <h1>PES <span>SUPER</span> LEAGUE 🏆</h1>
+        <div class="season-tabs">
+            <button class="season-button active" data-season="season1">Season 1</button>
+            <button class="season-button" data-season="season2">Season 2 (Upcoming)</button>
+        </div>
+        <nav class="nav">
+            <button class="nav-button active" data-target="points-table-section">League Table</button>
+            <button class="nav-button" data-target="fixtures-section">Fixtures & Results</button>
+            <button class="nav-button" data-target="top-scorers-section">Top Goal Scorers</button>
+        </nav>
+        <div style="margin-top: 10px;">
+            <a href="{{ url_for('landing') }}"
+                style="color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.9rem;">Back to Home</a>
+        </div>
+    </header>
+
+
+    <main class="container">
+
+        <!-- SEASON 1 DATA -->
+        <div id="season1-data">
+            <!-- Points Table -->
+            <section id="points-table-section" class="content-section active">
+                <div id="season1-champion-banner" class="champion-banner hidden">
+                    <h3>🏆 Christo shaju - Season 1 Champion 🏆</h3>
+                </div>
+                <h2>League Standings - Season 1</h2>
+                <div class="table-container">
+                    <table id="points-table" class="points-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Team</th>
+                                <th class="stat">P</th>
+                                <th class="stat">W</th>
+                                <th class="stat">D</th>
+                                <th class="stat">L</th>
+                                <th class="stat">GF</th>
+                                <th class="stat">GA</th>
+                                <th class="stat">GD</th>
+                                <th class="points">Pts</th>
+                                <th class="stat form-col">Form (Last 5)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="points-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Fixtures -->
+            <section id="fixtures-section" class="content-section hidden">
+                <h2>Fixtures & Results - Season 1</h2>
+                <div id="fixtures-list">
+                </div>
+            </section>
+
+            <!-- Top Scorers -->
+            <section id="top-scorers-section" class="content-section hidden">
+                <h2>Top Goal Scorers - Season 1 ⚽</h2>
+                <ul id="top-scorers-list">
+                </ul>
+            </section>
+        </div>
+
+        <!-- SEASON 2 DATA -->
+        <div id="season2-data" class="hidden">
+            <section id="points-table-section-s2" class="content-section active">
+                <h2>League Standings - Season 2</h2>
+                <div class="table-container">
+                    <table id="points-table-s2" class="points-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Team</th>
+                                <th class="stat">P</th>
+                                <th class="stat">W</th>
+                                <th class="stat">D</th>
+                                <th class="stat">L</th>
+                                <th class="stat">GF</th>
+                                <th class="stat">GA</th>
+                                <th class="stat">GD</th>
+                                <th class="points">Pts</th>
+                                <th class="stat form-col">Form (Last 5)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="points-table-body-s2">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="fixtures-section-s2" class="content-section hidden">
+                <h2>Fixtures & Results - Season 2</h2>
+                <div id="fixtures-list-s2">
+                </div>
+            </section>
+
+            <section id="top-scorers-section-s2" class="content-section hidden">
+                <h2>Top Goal Scorers - Season 2 ⚽</h2>
+                <ul id="top-scorers-list-s2">
+                </ul>
+            </section>
+        </div>
+
+
+    </main>
+
+
+    <footer class="footer">
+        <p>&copy; 2025 PES Super League | Professional League Management System</p>
+    </footer>
+
+    <!-- Pass backend data to JS -->
+    <script>
+        window.leagueDataBackend = {{ league_data | safe if league_data else 'null' }};
+    </script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+
+</html>

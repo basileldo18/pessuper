@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal | PES Super League</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #64748b;
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --danger: #ef4444;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        /* --- Header --- */
+        .navbar {
+            background: #1e293b;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand span {
+            color: var(--primary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-pill {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* --- Layout --- */
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* --- Tabs --- */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            background: white;
+            padding: 5px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            width: fit-content;
+        }
+
+        .tab-btn {
+            padding: 10px 30px;
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+        }
+
+        /* --- Information Cards --- */
+        .grid-dashboard {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 1024px) {
+            .grid-dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: var(--primary);
+        }
+
+        /* --- Table Styling --- */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #f8fafc;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.95rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #f8fafc;
+        }
+
+        input.editable {
+            width: 50px;
+            padding: 6px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            text-align: center;
+            font-weight: 500;
+            transition: border 0.2s;
+        }
+
+        input.editable:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        input.editable-text {
+            width: 80px;
+            text-align: left;
+        }
+
+        .primary-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .primary-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* --- Match Cards --- */
+        .fixtures-container {
+            max-height: 800px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .match-group-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin: 20px 0 10px 0;
+            text-transform: uppercase;
+        }
+
+        .match-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .match-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .match-card.completed {
+            border-left: 4px solid var(--success);
+        }
+
+        .teams-display {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+            margin: 0 15px;
+        }
+
+        .team-row {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .score-input-group {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .score-input {
+            width: 40px;
+            padding: 5px;
+            text-align: center;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-weight: 700;
+        }
+
+        .badge-update {
+            background: var(--text-main);
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .badge-update:hover {
+            background: var(--primary);
+        }
+
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .flash {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .flash.success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .flash.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* --- Mobile Responsiveness --- */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+                padding: 1rem;
+            }
+
+            .user-info {
+                width: 100%;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .tabs {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .grid-dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 15px;
+            }
+
+            /* --- Optimized Table for Mobile --- */
+            .table-responsive {
+                margin: 0 -15px;
+                /* Bleed to edge */
+                padding: 0 15px;
+                width: calc(100% + 30px);
+            }
+
+            table {
+                min-width: 600px;
+                /* Force scroll */
+            }
+
+            /* Sticky Team Name Column */
+            th:nth-child(2),
+            td:nth-child(2) {
+                position: sticky;
+                left: 0;
+                background: white;
+                /* Ensure it covers scrolling content */
+                z-index: 5;
+                box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+                /* Separator shadow */
+                min-width: 120px;
+            }
+
+            /* Sticky Header for Team Name */
+            th:nth-child(2) {
+                background: #f8fafc;
+                z-index: 15;
+                /* Higher than sticky body column */
+            }
+
+            /* Larger Inputs for Touch */
+            input.editable {
+                width: 60px;
+                padding: 10px;
+                font-size: 16px;
+                /* Prevents auto-zoom on iOS */
+            }
+
+            /* --- Tools Section Stacking --- */
+            .tools-card,
+            .add-team-form {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 15px !important;
+            }
+
+            .tools-card form {
+                width: 100% !important;
+                border-left: none !important;
+                padding-left: 0 !important;
+                border-top: 1px solid var(--border);
+                padding-top: 20px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .tools-card form:first-child {
+                border-top: none;
+                padding-top: 0;
+            }
+
+            /* --- Optimized Match Results --- */
+            .match-card {
+                flex-direction: column;
+                gap: 15px;
+                padding: 20px;
+                text-align: center;
+            }
+
+            .teams-display {
+                width: 100%;
+                margin: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .team-row {
+                justify-content: space-between;
+                width: 100%;
+                font-size: 1.1rem;
+                align-items: center;
+                border-bottom: 1px dashed var(--border);
+                padding-bottom: 8px;
+            }
+
+            .team-row:last-child {
+                border-bottom: none;
+            }
+
+            .score-input {
+                width: 60px;
+                padding: 8px;
+                font-size: 1.1rem;
+                text-align: center;
+            }
+
+            .badge-update {
+                width: 100%;
+                padding: 12px;
+                border-radius: 8px;
+                margin-top: 10px;
+                font-size: 1rem;
+            }
+
+            .badge-update i {
+                margin-right: 5px;
+            }
+
+            .badge-update::after {
+                content: " Update Match";
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <nav class="navbar">
+        <div class="brand">
+            <i class="fas fa-shield-alt"></i> PES Super League <span>Admin</span>
+        </div>
+        <div class="user-info">
+            <div class="user-pill"><i class="far fa-user"></i> {{ user }}</div>
+            <a href="{{ url_for('logout') }}" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <div class="page-header">
+            <div>
+                <h2 style="font-weight: 600;">Dashboard Overview</h2>
+                <p style="color: var(--text-muted);">Manage teams, points, and match results.</p>
+            </div>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('season1')">Season 1</button>
+                <button class="tab-btn" onclick="switchTab('season2')">Season 2</button>
+            </div>
+        </div>
+
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash {{ category }}">
+                <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }}"></i>
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+
+        <!-- === SEASON 1 CONTENT === -->
+        <div id="season1-content" class="season-view">
+            <div class="grid-dashboard">
+                <!-- Left Column: Points Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fas fa-table"></i> Edit League Table</div>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Season 1</span>
+                    </div>
+
+                    <!-- Add Team Form S1 -->
+                    <form class="add-team-form" action="{{ url_for('admin') }}" method="POST"
+                        style="margin-bottom: 20px; display: flex; gap: 10px; padding-bottom: 20px; border-bottom: 1px dashed var(--border);">
+                        <input type="hidden" name="action" value="add_team">
+                        <input type="hidden" name="season" value="season1">
+                        <input type="text" name="team_name" placeholder="New Team Name" required
+                            style="padding: 10px; border: 1px solid var(--border); border-radius: 6px; flex: 1;">
+                        <button type="submit" class="primary-btn"
+                            style="width: auto; margin-top: 0; padding: 10px 20px; font-size: 0.9rem;">
+                            <i class="fas fa-plus"></i> Add Team
+                        </button>
+                    </form>
+
+                    <form action="{{ url_for('admin') }}" method="POST">
+                        <input type="hidden" name="action" value="update_team">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Pos</th>
+                                        <th>Team Name</th>
+                                        <th>P</th>
+                                        <th>W</th>
+                                        <th>D</th>
+                                        <th>L</th>
+                                        <th>GF</th>
+                                        <th>GA</th>
+                                        <th>Pts</th>
+                                        <th>Form</th>
+                                        <th style="width: 50px;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for team in data.season1.teams %}
+                                    <tr>
+                                        <input type="hidden" name="team_id" value="{{ team.id }}">
+                                        <td style="color: var(--secondary); font-weight: 500;">{{ loop.index }}</td>
+                                        <td style="font-weight: 600;">{{ team.name }}</td>
+                                        <td><input type="number" name="played_{{ team.id }}" value="{{ team.played }}"
+                                                class="editable"></td>
+                                        <td><input type="number" name="won_{{ team.id }}" value="{{ team.won }}"
+                                                class="editable"></td>
+                                        <td><input type="number" name="drawn_{{ team.id }}" value="{{ team.drawn }}"
+                                                class="editable"></td>
+                                        <td><input type="number" name="lost_{{ team.id }}" value="{{ team.lost }}"
+                                                class="editable"></td>
+                                        <td><input type="number" name="gf_{{ team.id }}" value="{{ team.gf }}"
+                                                class="editable"></td>
+                                        <td><input type="number" name="ga_{{ team.id }}" value="{{ team.ga }}"
+                                                class="editable"></td>
+                                        <td><input type="number" name="points_{{ team.id }}" value="{{ team.points }}"
+                                                class="editable"
+                                                style="background: #eff6ff; border-color: #bfdbfe; color: #1e3a8a;">
+                                        </td>
+                                        <td><input type="text" name="form_{{ team.id }}" value="{{ team.form }}"
+                                                class="editable editable-text"></td>
+                                        <td>
+                                            <button type="button" class="badge-update"
+                                                style="background: var(--danger);"
+                                                onclick="confirmDelete('{{ team.id }}', '{{ team.name }}')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="submit" class="primary-btn"><i class="fas fa-save"></i> Publish All
+                            Changes</button>
+                    </form>
+                </div>
+
+                <!-- Right Column: Fixtures -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fas fa-futbol"></i> Match Results</div>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Season 1</span>
+                    </div>
+
+                    <div class="fixtures-container">
+                        {% if not data.season1.fixtures %}
+                        <p style="text-align: center; color: var(--text-muted); padding: 20px;">No fixtures found.</p>
+                        {% endif %}
+
+                        {% for match in data.season1.fixtures %}
+                        {% set prev_round = data.season1.fixtures[loop.index0 - 1].round if loop.index0 > 0 else None %}
+                        {% if match.round != prev_round %}
+                        <div class="match-group-title">
+                            {% if match.round|string in ['SF1', 'SF2', 'Final'] %}
+                            Knockout Stage
+                            {% else %}
+                            Round {{ match.round }}
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <form action="{{ url_for('admin') }}" method="POST" class="match-form">
+                            <input type="hidden" name="match_id" value="{{ match.id }}">
+
+                            <div class="match-card {{ 'completed' if match.status == 'Completed' else '' }}">
+                                <div class="teams-display">
+                                    <div class="team-row">
+                                        <span>{{ match.home_team }}</span>
+                                        <input type="number" name="home_score" class="score-input"
+                                            value="{{ match.home_score if match.home_score is not none else '' }}"
+                                            placeholder="-">
+                                    </div>
+                                    <div class="team-row" style="margin-top: 5px;">
+                                        <span>{{ match.away_team }}</span>
+                                        <input type="number" name="away_score" class="score-input"
+                                            value="{{ match.away_score if match.away_score is not none else '' }}"
+                                            placeholder="-">
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 5px;">
+                                    {% if match.status == 'Scheduled' %}
+                                    <button type="submit" name="action" value="update_fixture" class="badge-update"
+                                        title="Save Result" style="background: var(--primary);">
+                                        <i class="fas fa-save"></i>
+                                    </button>
+                                    {% else %}
+                                    <button type="submit" name="action" value="update_fixture" class="badge-update"
+                                        title="Update Score" style="background: var(--success);">
+                                        <i class="fas fa-pen"></i>
+                                    </button>
+                                    {% endif %}
+                                    <button type="submit" name="action" value="delete_fixture" class="badge-update"
+                                        style="background: var(--danger);" title="Delete Fixture"
+                                        onclick="return confirm('Delete this fixture?');">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === SEASON 2 CONTENT === -->
+        <div id="season2-content" class="season-view" style="display: none;">
+
+            <!-- Tools Section for S2 -->
+            <div class="card tools-card" style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+                <!-- Add Team -->
+                <form action="{{ url_for('admin') }}" method="POST"
+                    style="flex: 1; min-width: 300px; display: flex; gap: 10px;">
+                    <input type="hidden" name="action" value="add_team">
+                    <input type="hidden" name="season" value="season2">
+                    <input type="text" name="team_name" placeholder="New Team Name" required
+                        style="padding: 10px; border: 1px solid var(--border); border-radius: 6px; flex: 1;">
+                    <button type="submit" class="primary-btn" style="width: auto; margin-top: 0;">
+                        <i class="fas fa-plus"></i> Add Team
+                    </button>
+                </form>
+
+                <!-- Import Button -->
+                <form action="{{ url_for('admin') }}" method="POST"
+                    style="border-left: 1px solid var(--border); padding-left: 20px;">
+                    <input type="hidden" name="action" value="import_season1">
+                    <button type="submit" class="primary-btn"
+                        style="width: auto; margin-top: 0; background-color: var(--secondary);">
+                        <i class="fas fa-file-import"></i> Import Teams from Season 1
+                    </button>
+                </form>
+            </div>
+
+            <div class="grid-dashboard">
+                <!-- Left Column: Points Table S2 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fas fa-table"></i> Edit League Table</div>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Season 2</span>
+                    </div>
+
+                    <form action="{{ url_for('admin') }}" method="POST">
+                        <input type="hidden" name="action" value="update_team">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Pos</th>
+                                        <th>Team Name</th>
+                                        <th>P</th>
+                                        <th>W</th>
+                                        <th>D</th>
+                                        <th>L</th>
+                                        <th>GF</th>
+                                        <th>GA</th>
+                                        <th>Pts</th>
+                                        <th>Form</th>
+                                        <th style="width: 50px;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if not data.season2.teams %}
+                                    <tr>
+                                        <td colspan="11" style="text-align: center; padding: 20px;">No teams in Season
+                                            2. Use Import or Add Team.</td>
+                                    </tr>
+                                    {% endif %}
+                                    {% for team in data.season2.teams %}
+                                    <tr>
+                                        <input type="hidden" name="team_id" value="{{ team.id }}">
+                                        <td style="color: var(--secondary); font-weight: 500;">{{ loop.index }}</td>
+                                        <td style="font-weight: 600;">{{ team.name }}</td>
+                                        <td><input type="number" name="played_{{ team.id }}" value="{{ team.played }}"
+                                                class="editable"></td>
+                                        <td><input type="number" name="won_{{ team.id }}" value="{{ team.won }}"
+                                                class="editable"></td>
+                                        <td><input type="number" name="drawn_{{ team.id }}" value="{{ team.drawn }}"
+                                                class="editable"></td>
+                                        <td><input type="number" name="lost_{{ team.id }}" value="{{ team.lost }}"
+                                                class="editable"></td>
+                                        <td><input type="number" name="gf_{{ team.id }}" value="{{ team.gf }}"
+                                                class="editable"></td>
+                                        <td><input type="number" name="ga_{{ team.id }}" value="{{ team.ga }}"
+                                                class="editable"></td>
+                                        <td><input type="number" name="points_{{ team.id }}" value="{{ team.points }}"
+                                                class="editable"
+                                                style="background: #eff6ff; border-color: #bfdbfe; color: #1e3a8a;">
+                                        </td>
+                                        <td><input type="text" name="form_{{ team.id }}" value="{{ team.form }}"
+                                                class="editable editable-text"></td>
+                                        <td>
+                                            <button type="button" class="badge-update"
+                                                style="background: var(--danger);"
+                                                onclick="confirmDelete('{{ team.id }}', '{{ team.name }}')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="submit" class="primary-btn"><i class="fas fa-save"></i> Publish All
+                            Changes</button>
+                    </form>
+                </div>
+
+                <!-- Fixtures Column for S2 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fas fa-futbol"></i> Match Results</div>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Season 2</span>
+                    </div>
+                    <div class="fixtures-container">
+                        {% if not data.season2.fixtures %}
+                        <div style="text-align: center; padding: 20px;">
+                            <p style="color: var(--text-muted); margin-bottom: 15px;">No fixtures found.</p>
+                            <form action="{{ url_for('admin') }}" method="POST" enctype="multipart/form-data"
+                                style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+                                <input type="hidden" name="action" value="import_fixtures">
+                                <input type="hidden" name="season" value="season2">
+                                <label for="file-upload-s2" class="primary-btn"
+                                    style="width: auto; cursor: pointer; background: var(--secondary); padding: 10px 20px; font-size: 0.9rem;">
+                                    <i class="fas fa-file-excel"></i> Upload Fixtures (Excel)
+                                </label>
+                                <input id="file-upload-s2" type="file" name="fixtures_file" accept=".xlsx, .xls"
+                                    style="display: none;" onchange="this.form.submit()">
+                                <small style="color: var(--text-muted); font-size: 0.8rem;">Columns: Round, Home
+                                    Team,
+                                    Away Team</small>
+                                <div
+                                    style="display:flex; align-items:center; gap:10px; width:100%; justify-content:center; margin-top: 5px;">
+                                    <span style="color:#aaa; font-size: 0.8rem;">— OR —</span>
+                                </div>
+                                <button type="button" onclick="openGenerateModal('season2')" class="primary-btn"
+                                    style="width: auto; background: var(--primary); padding: 10px 20px; font-size: 0.9rem;">
+                                    <i class="fas fa-magic"></i> Generate Fixtures
+                                </button>
+                            </form>
+                        </div>
+                        {% else %}
+
+                        <!-- Fixture Tools (Import More / Delete All) -->
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+                            <form action="{{ url_for('admin') }}" method="POST"
+                                onsubmit="return confirm('WARNING: This will delete ALL fixtures for Season 2. Are you sure?');">
+                                <input type="hidden" name="action" value="delete_all_fixtures">
+                                <input type="hidden" name="season" value="season2">
+                                <button type="submit"
+                                    style="background: none; border: none; color: var(--danger); font-weight: 600; cursor: pointer; font-size: 0.85rem;">
+                                    <i class="fas fa-trash-alt"></i> Delete All Fixtures
+                                </button>
+                            </form>
+
+                            </form>
+
+                            <div style="display:flex; gap:15px; align-items:center;">
+                                <button onclick="openGenerateModal('season2')"
+                                    style="background:none; border:none; color:var(--primary); font-weight:600; cursor:pointer; font-size:0.85rem;">
+                                    <i class="fas fa-magic"></i> Generate
+                                </button>
+                                <a href="{{ url_for('download_fixtures', season='season2') }}" target="_blank"
+                                    style="color: #666; font-weight:600; font-size:0.85rem; text-decoration:none;">
+                                    <i class="fas fa-file-pdf"></i> PDF
+                                </a>
+                                <form action="{{ url_for('admin') }}" method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="action" value="import_fixtures">
+                                    <input type="hidden" name="season" value="season2">
+                                    <label for="file-upload-s2-more"
+                                        style="cursor: pointer; color: var(--secondary); font-size: 0.85rem; font-weight: 600;">
+                                        <i class="fas fa-plus-circle"></i> Import Excel
+                                    </label>
+                                    <input id="file-upload-s2-more" type="file" name="fixtures_file"
+                                        accept=".xlsx, .xls" style="display: none;" onchange="this.form.submit()">
+                                </form>
+                            </div>
+                        </div>
+
+                        {% for match in data.season2.fixtures %}
+                        {% set prev_round = data.season2.fixtures[loop.index0 - 1].round if loop.index0 > 0 else None %}
+                        {% if match.round != prev_round %}
+                        <div class="match-group-title">
+                            {% if match.round|string in ['SF1', 'SF2', 'Final'] %}
+                            Knockout Stage
+                            {% else %}
+                            Round {{ match.round }}
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <form action="{{ url_for('admin') }}" method="POST" class="match-form">
+                            <input type="hidden" name="match_id" value="{{ match.id }}">
+
+                            <div class="match-card {{ 'completed' if match.status == 'Completed' else '' }}">
+                                <div class="teams-display">
+                                    <div class="team-row">
+                                        <span>{{ match.home_team }}</span>
+                                        <input type="number" name="home_score" class="score-input"
+                                            value="{{ match.home_score if match.home_score is not none else '' }}"
+                                            placeholder="-">
+                                    </div>
+                                    <div class="team-row" style="margin-top: 5px;">
+                                        <span>{{ match.away_team }}</span>
+                                        <input type="number" name="away_score" class="score-input"
+                                            value="{{ match.away_score if match.away_score is not none else '' }}"
+                                            placeholder="-">
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 5px;">
+                                    {% if match.status == 'Scheduled' %}
+                                    <button type="submit" name="action" value="update_fixture" class="badge-update"
+                                        title="Save Result" style="background: var(--primary);">
+                                        <i class="fas fa-save"></i>
+                                    </button>
+                                    {% else %}
+                                    <button type="submit" name="action" value="update_fixture" class="badge-update"
+                                        title="Update Score" style="background: var(--success);">
+                                        <i class="fas fa-pen"></i>
+                                    </button>
+                                    {% endif %}
+                                    <button type="submit" name="action" value="delete_fixture" class="badge-update"
+                                        style="background: var(--danger);" title="Delete Fixture"
+                                        onclick="return confirm('Delete this fixture?');">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Hidden Form for Deletion -->
+        <form id="deleteForm" action="{{ url_for('admin') }}" method="POST" style="display: none;">
+            <input type="hidden" name="action" value="delete_team">
+            <input type="hidden" name="team_id" id="deleteInputId">
+        </form>
+
+        <script>
+            function confirmDelete(teamId, teamName) {
+                if (confirm(`Are you sure you want to delete ${teamName}? This cannot be undone.`)) {
+                    document.getElementById('deleteInputId').value = teamId;
+                    document.getElementById('deleteForm').submit();
+                }
+            }
+
+            function switchTab(season) {
+                // Update buttons
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+
+                // Toggle Content
+                document.getElementById('season1-content').style.display = 'none';
+                document.getElementById('season2-content').style.display = 'none';
+
+                document.getElementById(season + '-content').style.display = 'block';
+
+                // Animation feel
+                const content = document.getElementById(season + '-content');
+                content.style.opacity = '0';
+                setTimeout(() => {
+                    content.style.transition = 'opacity 0.3s';
+                    content.style.opacity = '1';
+                }, 10);
+            }
+
+            function openGenerateModal(season) {
+                document.getElementById('genSeasonInput').value = season;
+                document.getElementById('generateModal').style.display = 'flex';
+            }
+
+            // Auto-hide flash messages
+            setTimeout(() => {
+                const flashes = document.querySelector('.flash-messages');
+                if (flashes) {
+                    flashes.style.transition = 'opacity 0.5s';
+                    flashes.style.opacity = '0';
+                    setTimeout(() => flashes.remove(), 500);
+                }
+            }, 3000);
+        </script>
+
+        <!-- Generate Logic Modal -->
+        <div id="generateModal" class="modal"
+            style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+            <div
+                style="background:white; padding:25px; border-radius:12px; width:90%; max-width:400px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+                <h3 style="margin-top:0; color:var(--text);"><i class="fas fa-calendar-check"
+                        style="color:var(--primary);"></i> Generate Fixtures</h3>
+                <p style="color:var(--text-muted); font-size:0.95rem; line-height:1.5;">
+                    Automatically create a schedule for all teams present in this season.
+                </p>
+                <form action="{{ url_for('admin') }}" method="POST">
+                    <input type="hidden" name="action" value="generate_fixtures">
+                    <input type="hidden" name="season" id="genSeasonInput">
+
+                    <div style="margin: 20px 0; background: #f9f9f9; padding: 15px; border-radius: 8px;">
+                        <label style="display:block; margin-bottom:10px; font-weight:500; color:var(--text);">
+                            <i class="fas fa-retweet" style="color:var(--primary); margin-right:5px;"></i> Meetings per
+                            Pair
+                        </label>
+                        <p style="font-size:0.85rem; color:#666; margin-bottom:10px; margin-top:-5px;">
+                            How many times should each team play every other team?
+                        </p>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <input type="number" name="meetings_count" value="1" min="1" max="10" required
+                                style="padding:8px; border:1px solid #ccc; border-radius:4px; width:80px; font-weight:bold;">
+                            <span style="font-size:0.9rem;">times</span>
+                        </div>
+                        <p style="font-size:0.8rem; color:#888; margin-top:5px;">(e.g., 1 = Single RR, 2 = Home & Away)
+                        </p>
+                    </div>
+
+                    <div style="display:flex; justify-content:flex-end; gap:10px;">
+                        <button type="button" onclick="document.getElementById('generateModal').style.display='none'"
+                            style="background:none; border:1px solid var(--border); padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:600; color:#666;">Cancel</button>
+                        <button type="submit" class="primary-btn" style="width:auto; margin:0;">
+                            <i class="fas fa-play"></i> Create Schedule
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script>
+            function confirmDelete(teamId, teamName) {
+                if (confirm(`Are you sure you want to delete ${teamName}? This cannot be undone.`)) {
+                    document.getElementById('deleteInputId').value = teamId;
+                    document.getElementById('deleteForm').submit();
+                }
+            }
+
+            function switchTab(season) {
+                // Update buttons
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+
+                // Toggle Content
+                document.getElementById('season1-content').style.display = 'none';
+                document.getElementById('season2-content').style.display = 'none';
+
+                document.getElementById(season + '-content').style.display = 'block';
+
+                // Animation feel
+                const content = document.getElementById(season + '-content');
+                content.style.opacity = '0';
+                setTimeout(() => {
+                    content.style.transition = 'opacity 0.3s';
+                    content.style.opacity = '1';
+                }, 10);
+            }
+
+            function openGenerateModal(season) {
+                document.getElementById('genSeasonInput').value = season;
+                document.getElementById('generateModal').style.display = 'flex';
+            }
+
+            // Auto-hide flash messages
+            setTimeout(() => {
+                const flashes = document.querySelector('.flash-messages');
+                if (flashes) {
+                    flashes.style.transition = 'opacity 0.5s';
+                    flashes.style.opacity = '0';
+                    setTimeout(() => flashes.remove(), 500);
+                }
+            }, 3000);
+        </script>
+</body>
+
+</html>
