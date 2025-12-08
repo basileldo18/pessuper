@@ -3,143 +3,810 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PES Super League - Points & Fixtures</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Outfit:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --brand-blue: #004e92;
+            --brand-dark: #000428;
+            --brand-accent: #007bff;
+            --brand-gold: #ffd700;
+            --surface-glass: rgba(255, 255, 255, 0.95);
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --win-color: #22c55e;
+            --draw-color: #f59e0b;
+            --loss-color: #ef4444;
+            --border-light: rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at top right, #004e92, #000428);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            padding-bottom: 80px;
+            /* Space for footer/mobile nav if needed */
+        }
+
+        /* Animated Background Mesh */
+        .mesh-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.4;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .blob-1 {
+            top: -10%;
+            left: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: #4361ee;
+        }
+
+        .blob-2 {
+            bottom: -20%;
+            right: -10%;
+            width: 60vw;
+            height: 60vw;
+            background: #7209b7;
+            animation-delay: -5s;
+        }
+
+        .blob-3 {
+            top: 40%;
+            left: 30%;
+            width: 30vw;
+            height: 30vw;
+            background: #4cc9f0;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(20px, -20px) scale(1.05);
+            }
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 24px 16px 16px;
+            color: white;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1.brand-title {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 1.8rem;
+            margin: 0 0 16px;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            text-transform: uppercase;
+        }
+
+        h1 span {
+            color: var(--brand-gold);
+        }
+
+        /* Season Toggle */
+        .season-tabs {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            display: inline-flex;
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+
+        .season-button {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 8px 24px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .season-button.active {
+            background: var(--brand-accent);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Navigation Pills */
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 24px;
+            padding: 0 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-button {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-button.active {
+            background: white;
+            color: var(--brand-blue);
+            border-color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-link {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: white;
+        }
+
+        /* Main Content Glass Container */
+        .glass-container {
+            background: var(--surface-glass);
+            margin: 0 16px;
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            min-height: 400px;
+            position: relative;
+            z-index: 5;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2.section-title {
+            color: var(--brand-accent);
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 1.4rem;
+            margin: 0 0 20px 0;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+        }
+
+        /* Champion Banner */
+        .champion-banner {
+            background: linear-gradient(135deg, #ffd700, #ffb900);
+            color: #723b13;
+            padding: 16px;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 20px rgba(255, 185, 0, 0.3);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .champion-banner h3 {
+            margin: 0;
+            font-weight: 800;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Points Table Styling */
+        .qualification-legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 0.75rem;
+            margin-bottom: 16px;
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 12px;
+            color: var(--text-secondary);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .bg-final {
+            background-color: #ffd700;
+            box-shadow: 0 0 0 1px #eab308;
+        }
+
+        .bg-semi {
+            background-color: #dbeafe;
+            box-shadow: 0 0 0 1px #bfdbfe;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        table.points-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 600px;
+            /* Force horizontal scroll on small screens */
+            font-size: 0.9rem;
+        }
+
+        table th {
+            background: var(--brand-accent);
+            color: white;
+            padding: 14px 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+        }
+
+        table th:first-child {
+            border-top-left-radius: 12px;
+        }
+
+        table th:last-child {
+            border-top-right-radius: 12px;
+        }
+
+        table td {
+            padding: 14px 10px;
+            border-bottom: 1px solid var(--border-light);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Rank Column */
+        table td:first-child {
+            font-weight: 800;
+            color: var(--brand-accent);
+            background: rgba(241, 245, 249, 0.5);
+        }
+
+        /* Team Name Alignment */
+        table td:nth-child(2) {
+            text-align: left;
+            font-weight: 700;
+            color: var(--text-primary);
+            min-width: 140px;
+        }
+
+        /* Points Pill */
+        td.points-cell {
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--text-primary);
+            background: #fffbeb;
+            border-radius: 8px;
+        }
+
+        tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        /* Row Highlighting */
+        .row-final td {
+            background-color: #fffde7 !important;
+        }
+
+        .row-semi td {
+            background-color: #eff6ff !important;
+        }
+
+        .row-final td:first-child {
+            color: #b45309;
+        }
+
+        .row-semi td:first-child {
+            color: #1d4ed8;
+        }
+
+        /* Form Indicators */
+        .form-dots {
+            display: flex;
+            gap: 3px;
+            justify-content: center;
+        }
+
+        .dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.55rem;
+            font-weight: 800;
+            color: white;
+        }
+
+        .win {
+            background: var(--win-color);
+        }
+
+        .draw {
+            background: var(--draw-color);
+        }
+
+        .loss {
+            background: var(--loss-color);
+        }
+
+        /* Fixtures List */
+        .fixture-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .fixture-card {
+            background: white;
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.01);
+            transition: transform 0.2s;
+        }
+
+        .fixture-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--brand-accent);
+        }
+
+        .fixture-card.completed::before {
+            background: var(--win-color);
+        }
+
+        .team-block {
+            flex: 1;
+            text-align: center;
+        }
+
+        .team-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .score-badge {
+            background: var(--text-primary);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            min-width: 60px;
+            display: inline-block;
+        }
+
+        .vs-badge {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            background: #f1f5f9;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        /* Scorers List */
+        .scorer-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.01);
+        }
+
+        .scorer-rank {
+            font-weight: 900;
+            color: #cbd5e1;
+            font-size: 1.2rem;
+            width: 40px;
+        }
+
+        .scorer-item:first-child .scorer-rank {
+            color: #f59e0b;
+        }
+
+        .scorer-info {
+            flex: 1;
+            font-weight: 600;
+        }
+
+        .scorer-goals {
+            background: #ecfdf5;
+            color: var(--win-color);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-weight: 800;
+        }
+
+        /* Utilities */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 480px) {
+            h1.brand-title {
+                font-size: 1.5rem;
+            }
+
+            .nav-button {
+                font-size: 0.75rem;
+                padding: 6px 12px;
+            }
+
+            .season-button {
+                padding: 6px 16px;
+                font-size: 0.8rem;
+            }
+
+            .glass-container {
+                margin: 0 10px;
+                padding: 15px;
+            }
+
+            /* Hide non-essential columns on mobile */
+            table th:nth-child(5),
+            table td:nth-child(5),
+            /* D */
+            table th:nth-child(7),
+            table td:nth-child(7),
+            /* GF */
+            table th:nth-child(8),
+            table td:nth-child(8)
+
+            /* GA */
+                {
+                display: none;
+            }
+
+            .fixture-card {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+                padding: 20px 10px;
+            }
+
+            .fixture-card::before {
+                width: 100%;
+                height: 4px;
+                bottom: auto;
+            }
+
+            .team-block {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .team-name {
+                font-size: 1rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
+    <!-- Background Animation -->
+    <div class="mesh-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
 
-    <!-- Header / Branding -->
-    <header class="header">
-        <h1>PES <span>SUPER</span> LEAGUE 🏆</h1>
+    <!-- Header -->
+    <header>
+        <h1 class="brand-title">PES <span>SUPER</span> LEAGUE 🏆</h1>
+
         <div class="season-tabs">
             <button class="season-button active" data-season="season2">Season 2</button>
             <button class="season-button" data-season="season1">Season 1</button>
         </div>
-        <nav class="nav">
-            <button class="nav-button active" data-target="points-table-section">League Table</button>
-            <button class="nav-button" data-target="fixtures-section">Fixtures & Results</button>
-            <button class="nav-button" data-target="top-scorers-section">Top Goal Scorers</button>
-        </nav>
-        <div style="margin-top: 10px;">
-            <a href="{{ url_for('landing') }}"
-                style="color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.9rem;">Back to Home</a>
+
+        <div class="nav-container">
+            <button class="nav-button active" data-target="points-table-section">
+                <i class="fa-solid fa-table-list"></i> Table
+            </button>
+            <button class="nav-button" data-target="fixtures-section">
+                <i class="fa-solid fa-calendar-days"></i> Fixtures
+            </button>
+            <button class="nav-button" data-target="top-scorers-section">
+                <i class="fa-solid fa-futbol"></i> Scorers
+            </button>
         </div>
+
+        <a href="{{ url_for('landing') }}" class="back-link">
+            <i class="fa-solid fa-chevron-left" style="margin-right: 4px;"></i> Back to Home
+        </a>
     </header>
 
+    <!-- Main Content Area -->
+    <main class="glass-container">
 
-    <main class="container">
-
-        <!-- SEASON 1 DATA -->
         <!-- SEASON 1 DATA -->
         <div id="season1-data" class="hidden">
             <!-- Points Table -->
-            <section id="points-table-section" class="content-section active">
+            <section id="points-table-section-s1" class="content-section active">
                 <div id="season1-champion-banner" class="champion-banner hidden">
                     <h3>🏆 Christo shaju - Season 1 Champion 🏆</h3>
                 </div>
-                <h2>League Standings - Season 1</h2>
-                <div class="table-container">
-                    <table id="points-table" class="points-table">
+                <h2 class="section-title">League Standings - Season 1</h2>
+
+                <div class="table-responsive">
+                    <table class="points-table">
                         <thead>
                             <tr>
                                 <th>#</th>
                                 <th>Team</th>
-                                <th class="stat">P</th>
-                                <th class="stat">W</th>
-                                <th class="stat">D</th>
-                                <th class="stat">L</th>
-                                <th class="stat">GF</th>
-                                <th class="stat">GA</th>
-                                <th class="stat">GD</th>
-                                <th class="points">Pts</th>
-                                <th class="stat form-col">Form (Last 5)</th>
+                                <th>P</th>
+                                <th>W</th>
+                                <th>D</th>
+                                <th>L</th>
+                                <th>GF</th>
+                                <th>GA</th>
+                                <th>GD</th>
+                                <th>Pts</th>
+                                <th>Form</th>
                             </tr>
                         </thead>
                         <tbody id="points-table-body">
+                            <!-- Populated by JS -->
                         </tbody>
                     </table>
                 </div>
             </section>
 
             <!-- Fixtures -->
-            <section id="fixtures-section" class="content-section hidden">
-                <h2>Fixtures & Results - Season 1</h2>
-                <div id="fixtures-list">
-                </div>
+            <section id="fixtures-section-s1" class="content-section hidden">
+                <h2 class="section-title">Fixtures & Results - Season 1</h2>
+                <div id="fixtures-list" class="fixture-list"></div>
             </section>
 
             <!-- Top Scorers -->
-            <section id="top-scorers-section" class="content-section hidden">
-                <h2>Top Goal Scorers - Season 1 ⚽</h2>
-                <ul id="top-scorers-list">
-                </ul>
+            <section id="top-scorers-section-s1" class="content-section hidden">
+                <h2 class="section-title">Top Goal Scorers - Season 1</h2>
+                <div id="top-scorers-list"></div>
             </section>
         </div>
 
         <!-- SEASON 2 DATA -->
         <div id="season2-data">
+            <!-- Points Table -->
             <section id="points-table-section-s2" class="content-section active">
-                <h2>League Standings - Season 2</h2>
-                <div class="table-container">
-                    <div class="qualification-legend"
-                        style="padding: 15px; border-bottom: 1px solid #eee; background: #fafafa;">
-                        <div class="legend-item">
-                            <span class="legend-color bg-final"></span>
-                            <span>1st Place: Direct Final 🏆</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color bg-semi"></span>
-                            <span>2nd & 3rd: Semi-Final Qualifier ⚔️</span>
-                        </div>
+                <h2 class="section-title">League Standings - Season 2</h2>
+
+                <div class="qualification-legend">
+                    <div class="legend-item">
+                        <span class="legend-color bg-final"></span>
+                        <span>1st: Direct Final 🏆</span>
                     </div>
-                    <table id="points-table-s2" class="points-table">
+                    <div class="legend-item">
+                        <span class="legend-color bg-semi"></span>
+                        <span>2nd & 3rd: Semi-Finals ⚔️</span>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="points-table">
                         <thead>
                             <tr>
                                 <th>#</th>
                                 <th>Team</th>
-                                <th class="stat">P</th>
-                                <th class="stat">W</th>
-                                <th class="stat">D</th>
-                                <th class="stat">L</th>
-                                <th class="stat">GF</th>
-                                <th class="stat">GA</th>
-                                <th class="stat">GD</th>
-                                <th class="points">Pts</th>
-                                <th class="stat form-col">Form (Last 5)</th>
+                                <th>P</th>
+                                <th>W</th>
+                                <th>D</th>
+                                <th>L</th>
+                                <th>GF</th>
+                                <th>GA</th>
+                                <th>GD</th>
+                                <th>Pts</th>
+                                <th>Form</th>
                             </tr>
                         </thead>
                         <tbody id="points-table-body-s2">
+                            <!-- Populated by JS -->
                         </tbody>
                     </table>
                 </div>
             </section>
 
+            <!-- Fixtures -->
             <section id="fixtures-section-s2" class="content-section hidden">
-                <h2>Fixtures & Results - Season 2</h2>
-                <div id="fixtures-list-s2">
-                </div>
+                <h2 class="section-title">Fixtures & Results - Season 2</h2>
+                <div id="fixtures-list-s2" class="fixture-list"></div>
             </section>
 
+            <!-- Top Scorers -->
             <section id="top-scorers-section-s2" class="content-section hidden">
-                <h2>Top Goal Scorers - Season 2 ⚽</h2>
-                <ul id="top-scorers-list-s2">
-                </ul>
+                <h2 class="section-title">Top Goal Scorers - Season 2</h2>
+                <div id="top-scorers-list-s2"></div>
             </section>
         </div>
 
-
     </main>
 
-
-    <footer class="footer">
-        <p>&copy; 2025 PES Super League | Professional League Management System</p>
-    </footer>
-
-    <!-- Pass backend data to JS -->
+    <!-- Pass backend data to JS & Include Script -->
     <script>
         window.leagueDataBackend = {{ league_data | safe if league_data else 'null' }};
+
+        // Inline JS wrapper to handle the tab switching logic since I changed IDs slightly
+        // or ensure external JS works.
+        // The external JS likely targets IDs like 'points-table-body'.
+        // I kept those IDs consistent.
+
+        // Re-implementing tab logic here to ensure it works with new classes
+        document.addEventListener('DOMContentLoaded', () => {
+            const seasonBtns = document.querySelectorAll('.season-button');
+            const navBtns = document.querySelectorAll('.nav-button');
+            const s1Container = document.getElementById('season1-data');
+            const s2Container = document.getElementById('season2-data');
+
+            let currentSeason = 'season2';
+
+            // Season Switching
+            seasonBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    seasonBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentSeason = btn.dataset.season;
+
+                    if (currentSeason === 'season1') {
+                        s1Container.classList.remove('hidden');
+                        s2Container.classList.add('hidden');
+                        updateNavTargets('s1');
+                    } else {
+                        s1Container.classList.add('hidden');
+                        s2Container.classList.remove('hidden');
+                        updateNavTargets('s2');
+                    }
+                });
+            });
+
+            // Content Navigation (Table/Fixtures/Scorers)
+            navBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    navBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    const baseTarget = btn.dataset.target.replace('-s1', '').replace('-s2', '');
+
+                    // Hide all sections in current season container
+                    const container = currentSeason === 'season1' ? s1Container : s2Container;
+                    container.querySelectorAll('.content-section').forEach(sec => sec.classList.add('hidden'));
+
+                    // Show target
+                    const targetId = baseTarget.replace('section', '') + 'section-' + (currentSeason === 'season1' ? 's1' : 's2');
+                    // Simpler logic: The "data-target" in my HTML above needs to be generic so JS can map it to s1 or s2
+                    // My HTML has data-target="points-table-section" generic.
+                    // The IDs are "points-table-section-s1".
+
+                    const actualTargetId = btn.dataset.target + (currentSeason === 'season1' ? '-s1' : '-s2');
+                    document.getElementById(actualTargetId).classList.remove('hidden');
+                });
+            });
+
+            function updateNavTargets(suffix) {
+                // Reset to first tab when switching season
+                navBtns[0].click();
+            }
+        });
     </script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
