@@ -713,6 +713,12 @@
                         <span style="font-size: 0.8rem; color: var(--text-muted);">Season 1</span>
                     </div>
 
+                    <div style="padding: 0 25px 15px 25px;">
+                        <input type="text" id="searchFixtureS1" onkeyup="searchFixtures('season1')"
+                            placeholder="Search fixtures by team..."
+                            style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem;">
+                    </div>
+
                     <div class="fixtures-container">
                         {% if not data.season1.fixtures %}
                         <p style="text-align: center; color: var(--text-muted); padding: 20px;">No fixtures found.</p>
@@ -881,6 +887,12 @@
                     <div class="card-header">
                         <div class="card-title"><i class="fas fa-futbol"></i> Match Results</div>
                         <span style="font-size: 0.8rem; color: var(--text-muted);">Season 2</span>
+                    </div>
+
+                    <div style="padding: 0 25px 15px 25px;">
+                        <input type="text" id="searchFixtureS2" onkeyup="searchFixtures('season2')"
+                            placeholder="Search fixtures by team..."
+                            style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem;">
                     </div>
                     <div class="fixtures-container">
                         {% if not data.season2.fixtures %}
@@ -1139,6 +1151,34 @@
                     setTimeout(() => flashes.remove(), 500);
                 }
             }, 3000);
+
+            function searchFixtures(season) {
+                let input, filter, container, items, i, txtValue;
+                if (season === 'season1') {
+                    input = document.getElementById('searchFixtureS1');
+                    container = document.querySelector('#season1-content .fixtures-container');
+                } else {
+                    input = document.getElementById('searchFixtureS2');
+                    container = document.querySelector('#season2-content .fixtures-container');
+                }
+
+                if (!container) return;
+
+                filter = input.value.toUpperCase();
+                items = container.getElementsByClassName('match-form');
+
+                for (i = 0; i < items.length; i++) {
+                    let teamsDisplay = items[i].querySelector('.teams-display');
+                    if (teamsDisplay) {
+                        txtValue = teamsDisplay.textContent || teamsDisplay.innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            items[i].style.display = "";
+                        } else {
+                            items[i].style.display = "none";
+                        }
+                    }
+                }
+            }
         </script>
 </body>
 
