@@ -73,11 +73,15 @@ def points():
                 "season2": {
                     "teams": [t for t in teams if t['season'] == 'season2'],
                     "fixtures": [f for f in fixtures if f['season'] == 'season2']
+                },
+                "season3": {
+                    "teams": [t for t in teams if t['season'] == 'season3'],
+                    "fixtures": [f for f in fixtures if f['season'] == 'season3']
                 }
             }
         except Exception as e:
             print(f"Error fetching data: {e}")
-            league_data = {"season1": {"teams": [], "fixtures": []}, "season2": {"teams": [], "fixtures": []}}
+            league_data = {"season1": {"teams": [], "fixtures": []}, "season2": {"teams": [], "fixtures": []}, "season3": {"teams": [], "fixtures": []}}
 
     return render_template('index.html', league_data=json.dumps(league_data))
 
@@ -237,6 +241,23 @@ def admin():
                         }).execute()
                 
                 flash("Season 1 teams imported to Season 2 successfully!", "success")
+
+            elif action == 'import_season2':
+                # Fetch Season 2 teams
+                s2_teams = supabase.table('teams').select('*').eq('season', 'season2').execute().data
+                
+                # Insert them as Season 3 teams (reset stats)
+                for team in s2_teams:
+                    existing = supabase.table('teams').select('id').eq('season', 'season3').eq('name', team['name']).execute().data
+                    if not existing:
+                        supabase.table('teams').insert({
+                            'name': team['name'],
+                            'season': 'season3',
+                            'played': 0, 'won': 0, 'drawn': 0, 'lost': 0,
+                            'gf': 0, 'ga': 0, 'points': 0, 'form': ''
+                        }).execute()
+                
+                flash("Season 2 teams imported to Season 3 successfully!", "success")
 
             elif action == 'delete_team':
                 team_id = request.form.get('team_id')
@@ -412,6 +433,10 @@ def admin():
             "season2": {
                 "teams": [t for t in all_teams if t['season'] == 'season2'],
                 "fixtures": [f for f in all_fixtures if f['season'] == 'season2']
+            },
+            "season3": {
+                "teams": [t for t in all_teams if t['season'] == 'season3'],
+                "fixtures": [f for f in all_fixtures if f['season'] == 'season3']
             }
         }
         
@@ -419,7 +444,7 @@ def admin():
         team_requests = supabase.table('team_requests').select('*').order('created_at', desc=True).execute().data
         
     except Exception as e: # Catch specific exceptions if possible, e.g., Supabase errors
-        data = {"season1": {"teams": [], "fixtures": []}, "season2": {"teams": [], "fixtures": []}}
+        data = {"season1": {"teams": [], "fixtures": []}, "season2": {"teams": [], "fixtures": []}, "season3": {"teams": [], "fixtures": []}}
         team_requests = []
         flash(f"Error fetching admin data: {e}", "error")
         
@@ -589,6 +614,9 @@ def analysis_list_old(): # Renamed to avoid conflict with new analysis_list
 def team_analysis(team_id):
     if not supabase: return redirect(url_for('landing'))
     
+    # Get season from query parameter, default to season3
+    selected_season = request.args.get('season', 'season3')
+    
     # 1. Get Team Details
     team = supabase.table('teams').select('*').eq('id', team_id).single().execute().data
     if not team:
@@ -597,6 +625,16 @@ def team_analysis(team_id):
         
     team_name = team['name']
     season = team['season']
+    
+    # Check if user wants a different season view - redirect to a team in that season
+    if selected_season != season:
+        # Find the same team name in the selected season
+        alt_team = supabase.table('teams').select('*').eq('name', team_name).eq('season', selected_season).execute().data
+        if alt_team:
+            return redirect(url_for('team_analysis', team_id=alt_team[0]['id'], season=selected_season))
+        else:
+            flash(f"{team_name} not found in {selected_season}", "warning")
+            # Stay on current team but show message
     
     # 2. Get All Fixtures for this team
     # Supabase "or" syntax is a bit specific: .or_(f"home_team.eq.{team_name},away_team.eq.{team_name}")
@@ -651,6 +689,13 @@ def team_analysis(team_id):
     leader_points = standings[0]['points'] if standings else 0
     points_to_leader = leader_points - current_points
     
+    # 6. Get available seasons for team (for season switcher) - exclude season1
+    available_seasons = []
+    for s in ['season3', 'season2']:
+        team_in_season = supabase.table('teams').select('id').eq('name', team_name).eq('season', s).execute().data
+        if team_in_season:
+            available_seasons.append(s)
+    
     return render_template('analysis_detail.html', 
                          team=team,
                          matches_played=matches_played,
@@ -660,7 +705,8 @@ def team_analysis(team_id):
                          remaining_matches=remaining_matches,
                          current_rank=current_rank,
                          leader_points=leader_points,
-                         points_to_leader=points_to_leader)
+                         points_to_leader=points_to_leader,
+                         available_seasons=available_seasons)
 
 @app.route('/logout')
 def logout():

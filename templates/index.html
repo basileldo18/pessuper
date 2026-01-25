@@ -616,7 +616,8 @@
         <h1 class="brand-title">PES <span>SUPER</span> LEAGUE 🏆</h1>
 
         <div class="season-tabs">
-            <button class="season-button active" data-season="season2">Season 2</button>
+            <button class="season-button active" data-season="season3">Season 3</button>
+            <button class="season-button" data-season="season2">Season 2</button>
             <button class="season-button" data-season="season1">Season 1</button>
         </div>
 
@@ -687,7 +688,7 @@
         </div>
 
         <!-- SEASON 2 DATA -->
-        <div id="season2-data">
+        <div id="season2-data" class="hidden">
             <!-- Points Table -->
             <section id="points-table-section-s2" class="content-section active">
                 <h2 class="section-title">League Standings - Season 2</h2>
@@ -737,6 +738,49 @@
             <section id="top-scorers-section-s2" class="content-section hidden">
                 <h2 class="section-title">Top Goal Scorers - Season 2</h2>
                 <div id="top-scorers-list-s2"></div>
+            </section>
+        </div>
+
+        <!-- SEASON 3 DATA -->
+        <div id="season3-data">
+            <!-- Points Table -->
+            <section id="points-table-section-s3" class="content-section active">
+                <h2 class="section-title">League Standings - Season 3</h2>
+
+                <div class="table-responsive">
+                    <table class="points-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Team</th>
+                                <th>P</th>
+                                <th>W</th>
+                                <th>D</th>
+                                <th>L</th>
+                                <th>GF</th>
+                                <th>GA</th>
+                                <th>GD</th>
+                                <th>Pts</th>
+                                <th>Form</th>
+                            </tr>
+                        </thead>
+                        <tbody id="points-table-body-s3">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Fixtures -->
+            <section id="fixtures-section-s3" class="content-section hidden">
+                <h2 class="section-title">Fixtures & Results - Season 3</h2>
+                <div id="fixtures-list-s3" class="fixture-list"></div>
+            </section>
+
+            <!-- Top Scorers -->
+            <section id="top-scorers-section-s3" class="content-section hidden">
+                <h2 class="section-title">Top Goal Scorers - Season 3</h2>
+                <div id="top-scorers-list-s3"></div>
             </section>
         </div>
 

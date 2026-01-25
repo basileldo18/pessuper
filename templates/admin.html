@@ -558,7 +558,8 @@
                 <p style="color: var(--text-muted);">Manage teams, points, and match results.</p>
             </div>
             <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('season2')">Season 2</button>
+                <button class="tab-btn active" onclick="switchTab('season3')">Season 3</button>
+                <button class="tab-btn" onclick="switchTab('season2')">Season 2</button>
                 <button class="tab-btn" onclick="switchTab('season1')">Season 1</button>
             </div>
         </div>
@@ -781,7 +782,7 @@
         </div>
 
         <!-- === SEASON 2 CONTENT === -->
-        <div id="season2-content" class="season-view">
+        <div id="season2-content" class="season-view" style="display: none;">
 
             <!-- Tools Section for S2 -->
             <div class="card tools-card" style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
@@ -891,7 +892,7 @@
 
                     <div style="padding: 0 25px 15px 25px;">
                         <input type="text" id="searchFixtureS2" onkeyup="searchFixtures('season2')"
-                            placeholder="Search fixtures by team..."
+                            placeholder="Search Fixtures by team..."
                             style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem;">
                     </div>
                     <div class="fixtures-container">
@@ -1018,6 +1019,242 @@
 
         </div>
 
+        <!-- === SEASON 3 CONTENT === -->
+        <div id="season3-content" class="season-view">
+
+            <!-- Tools Section for S3 -->
+            <div class="card tools-card" style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+                <!-- Add Team -->
+                <form action="{{ url_for('admin') }}" method="POST"
+                    style="flex: 1; min-width: 300px; display: flex; gap: 10px;">
+                    <input type="hidden" name="action" value="add_team">
+                    <input type="hidden" name="season" value="season3">
+                    <input type="text" name="team_name" placeholder="New Team Name" required
+                        style="padding: 10px; border: 1px solid var(--border); border-radius: 6px; flex: 1;">
+                    <button type="submit" class="primary-btn" style="width: auto; margin-top: 0;">
+                        <i class="fas fa-plus"></i> Add Team
+                    </button>
+                </form>
+
+                <!-- Import Button -->
+                <form action="{{ url_for('admin') }}" method="POST"
+                    style="border-left: 1px solid var(--border); padding-left: 20px;">
+                    <input type="hidden" name="action" value="import_season2">
+                    <button type="submit" class="primary-btn"
+                        style="width: auto; margin-top: 0; background-color: var(--secondary);">
+                        <i class="fas fa-file-import"></i> Import Teams from Season 2
+                    </button>
+                </form>
+            </div>
+
+            <div class="grid-dashboard">
+                <!-- Left Column: Points Table S3 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fas fa-table"></i> Edit League Table</div>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Season 3</span>
+                    </div>
+
+                    <form action="{{ url_for('admin') }}" method="POST">
+                        <input type="hidden" name="action" value="update_team">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Pos</th>
+                                        <th>Team Name</th>
+                                        <th>P</th>
+                                        <th>W</th>
+                                        <th>D</th>
+                                        <th>L</th>
+                                        <th>GF</th>
+                                        <th>GA</th>
+                                        <th>Pts</th>
+                                        <th>Form</th>
+                                        <th style="width: 50px;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if not data.season3.teams %}
+                                    <tr>
+                                        <td colspan="11" style="text-align: center; padding: 20px;">No teams in Season
+                                            3. Use Import or Add Team.</td>
+                                    </tr>
+                                    {% endif %}
+                                    {% for team in data.season3.teams %}
+                                    <tr>
+                                        <input type="hidden" name="team_id" value="{{ team.id }}">
+                                        <td style="color: var(--secondary); font-weight: 500;">{{ loop.index }}</td>
+                                        <td style="font-weight: 600;">{{ team.name }}</td>
+                                        <td><input type="number" name="played_{{ team.id }}" value="{{ team.played }}"
+                                                class="editable"></td>
+                                        <td><input type="number" name="won_{{ team.id }}" value="{{ team.won }}"
+                                                class="editable"></td>
+                                        <td><input type="number" name="drawn_{{ team.id }}" value="{{ team.drawn }}"
+                                                class="editable"></td>
+                                        <td><input type="number" name="lost_{{ team.id }}" value="{{ team.lost }}"
+                                                class="editable"></td>
+                                        <td><input type="number" name="gf_{{ team.id }}" value="{{ team.gf }}"
+                                                class="editable"></td>
+                                        <td><input type="number" name="ga_{{ team.id }}" value="{{ team.ga }}"
+                                                class="editable"></td>
+                                        <td><input type="number" name="points_{{ team.id }}" value="{{ team.points }}"
+                                                class="editable"
+                                                style="background: #eff6ff; border-color: #bfdbfe; color: #1e3a8a;">
+                                        </td>
+                                        <td><input type="text" name="form_{{ team.id }}" value="{{ team.form }}"
+                                                class="editable editable-text"></td>
+                                        <td>
+                                            <button type="button" class="badge-update"
+                                                style="background: var(--danger);"
+                                                onclick="confirmDelete('{{ team.id }}', '{{ team.name }}')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="submit" class="primary-btn"><i class="fas fa-save"></i> Publish All
+                            Changes</button>
+                    </form>
+                </div>
+
+                <!-- Fixtures Column for S3 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fas fa-futbol"></i> Match Results</div>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Season 3</span>
+                    </div>
+
+                    <div style="padding: 0 25px 15px 25px;">
+                        <input type="text" id="searchFixtureS3" onkeyup="searchFixtures('season3')"
+                            placeholder="Search fixtures by team..."
+                            style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem;">
+                    </div>
+                    <div class="fixtures-container">
+                        {% if not data.season3.fixtures %}
+                        <div style="text-align: center; padding: 20px;">
+                            <p style="color: var(--text-muted); margin-bottom: 15px;">No fixtures found.</p>
+                            <form action="{{ url_for('admin') }}" method="POST" enctype="multipart/form-data"
+                                style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+                                <input type="hidden" name="action" value="import_fixtures">
+                                <input type="hidden" name="season" value="season3">
+                                <label for="file-upload-s3" class="primary-btn"
+                                    style="width: auto; cursor: pointer; background: var(--secondary); padding: 10px 20px; font-size: 0.9rem;">
+                                    <i class="fas fa-file-excel"></i> Upload Fixtures (Excel)
+                                </label>
+                                <input id="file-upload-s3" type="file" name="fixtures_file" accept=".xlsx, .xls"
+                                    style="display: none;" onchange="this.form.submit()">
+                                <small style="color: var(--text-muted); font-size: 0.8rem;">Columns: Round, Home
+                                    Team,
+                                    Away Team</small>
+                                <div
+                                    style="display:flex; align-items:center; gap:10px; width:100%; justify-content:center; margin-top: 5px;">
+                                    <span style="color:#aaa; font-size: 0.8rem;">— OR —</span>
+                                </div>
+                                <button type="button" onclick="openGenerateModal('season3')" class="primary-btn"
+                                    style="width: auto; background: var(--primary); padding: 10px 20px; font-size: 0.9rem;">
+                                    <i class="fas fa-magic"></i> Generate Fixtures
+                                </button>
+                            </form>
+                        </div>
+                        {% else %}
+
+                        <!-- Fixture Tools (Import More / Delete All) -->
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+                            <form action="{{ url_for('admin') }}" method="POST"
+                                onsubmit="return confirm('WARNING: This will delete ALL fixtures for Season 3. Are you sure?');">
+                                <input type="hidden" name="action" value="delete_all_fixtures">
+                                <input type="hidden" name="season" value="season3">
+                                <button type="submit"
+                                    style="background: none; border: none; color: var(--danger); font-weight: 600; cursor: pointer; font-size: 0.85rem;">
+                                    <i class="fas fa-trash-alt"></i> Delete All Fixtures
+                                </button>
+                            </form>
+
+                            <div style="display:flex; gap:15px; align-items:center;">
+                                <button onclick="openGenerateModal('season3')"
+                                    style="background:none; border:none; color:var(--primary); font-weight:600; cursor:pointer; font-size:0.85rem;">
+                                    <i class="fas fa-magic"></i> Generate
+                                </button>
+                                <a href="{{ url_for('download_fixtures', season='season3') }}" target="_blank"
+                                    style="color: #666; font-weight:600; font-size:0.85rem; text-decoration:none;">
+                                    <i class="fas fa-file-pdf"></i> PDF
+                                </a>
+                                <form action="{{ url_for('admin') }}" method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="action" value="import_fixtures">
+                                    <input type="hidden" name="season" value="season3">
+                                    <label for="file-upload-s3-more"
+                                        style="cursor: pointer; color: var(--secondary); font-size: 0.85rem; font-weight: 600;">
+                                        <i class="fas fa-plus-circle"></i> Import Excel
+                                    </label>
+                                    <input id="file-upload-s3-more" type="file" name="fixtures_file"
+                                        accept=".xlsx, .xls" style="display: none;" onchange="this.form.submit()">
+                                </form>
+                            </div>
+                        </div>
+
+                        {% for match in data.season3.fixtures %}
+                        {% set prev_round = data.season3.fixtures[loop.index0 - 1].round if loop.index0 > 0 else None %}
+                        {% if match.round != prev_round %}
+                        <div class="match-group-title">
+                            {% if match.round|string in ['SF1', 'SF2', 'Final'] %}
+                            Knockout Stage
+                            {% else %}
+                            Round {{ match.round }}
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <form action="{{ url_for('admin') }}" method="POST" class="match-form">
+                            <input type="hidden" name="match_id" value="{{ match.id }}">
+
+                            <div class="match-card {{ 'completed' if match.status == 'Completed' else '' }}">
+                                <div class="teams-display">
+                                    <div class="team-row">
+                                        <span>{{ match.home_team }}</span>
+                                        <input type="number" name="home_score" class="score-input"
+                                            value="{{ match.home_score if match.home_score is not none else '' }}"
+                                            placeholder="-">
+                                    </div>
+                                    <div class="team-row" style="margin-top: 5px;">
+                                        <span>{{ match.away_team }}</span>
+                                        <input type="number" name="away_score" class="score-input"
+                                            value="{{ match.away_score if match.away_score is not none else '' }}"
+                                            placeholder="-">
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 5px;">
+                                    {% if match.status == 'Scheduled' %}
+                                    <button type="submit" name="action" value="update_fixture" class="badge-update"
+                                        title="Save Result" style="background: var(--primary);">
+                                        <i class="fas fa-save"></i>
+                                    </button>
+                                    {% else %}
+                                    <button type="submit" name="action" value="update_fixture" class="badge-update"
+                                        title="Update Score" style="background: var(--success);">
+                                        <i class="fas fa-pen"></i>
+                                    </button>
+                                    {% endif %}
+                                    <button type="submit" name="action" value="delete_fixture" class="badge-update"
+                                        style="background: var(--danger);" title="Delete Fixture"
+                                        onclick="return confirm('Delete this fixture?');">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
         <!-- Hidden Form for Deletion -->
         <form id="deleteForm" action="{{ url_for('admin') }}" method="POST" style="display: none;">
             <input type="hidden" name="action" value="delete_team">
@@ -1040,6 +1277,7 @@
                 // Toggle Content
                 document.getElementById('season1-content').style.display = 'none';
                 document.getElementById('season2-content').style.display = 'none';
+                document.getElementById('season3-content').style.display = 'none';
 
                 document.getElementById(season + '-content').style.display = 'block';
 
@@ -1157,9 +1395,12 @@
                 if (season === 'season1') {
                     input = document.getElementById('searchFixtureS1');
                     container = document.querySelector('#season1-content .fixtures-container');
-                } else {
+                } else if (season === 'season2') {
                     input = document.getElementById('searchFixtureS2');
                     container = document.querySelector('#season2-content .fixtures-container');
+                } else {
+                    input = document.getElementById('searchFixtureS3');
+                    container = document.querySelector('#season3-content .fixtures-container');
                 }
 
                 if (!container) return;

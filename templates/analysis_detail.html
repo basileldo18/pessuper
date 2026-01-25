@@ -298,15 +298,31 @@
         <a href="{{ url_for('landing') }}" class="nav-link">Home</a>
     </nav>
 
+    <!-- Season Switcher -->
+    <div
+        style="background: white; padding: 15px 20px; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+        <span style="font-weight: 600; color: #64748b; font-size: 0.9rem; margin-right: 10px;">View Season:</span>
+        {% for season_option in ['season3', 'season2'] %}
+        {% if season_option in available_seasons %}
+        <a href="{{ url_for('team_analysis', team_id=team.id, season=season_option) }}"
+            style="padding: 8px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: all 0.2s;
+                          {% if team.season == season_option %}background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);{% else %}background: #f1f5f9; color: #64748b;{% endif %}">
+            {{ season_option.replace('season', 'Season ') }}
+        </a>
+        {% endif %}
+        {% endfor %}
+    </div>
+
     <div class="hero">
         <div class="team-badge-lg">{{ team.name[0] }}</div>
         <h1>{{ team.name }}</h1>
-        <p>Rank #{{ current_rank }} • {{ team.season }}</p>
+        <p>Rank #{{ current_rank }} • {{ team.season.replace('season', 'Season ') }}</p>
     </div>
 
     <div class="container">
 
         <!-- Tournament Structure Info -->
+        {% if team.season in ['season2', 'season3'] %}
         <div
             style="background: white; padding: 15px 25px; border-radius: 12px; margin-bottom: 25px; border-left: 5px solid #4f46e5; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
             <div style="font-size: 1.5rem;">ℹ️</div>
@@ -319,6 +335,18 @@
                 </p>
             </div>
         </div>
+        {% elif team.season == 'season1' %}
+        <div
+            style="background: linear-gradient(135deg, #ffd700, #ffb900); padding: 15px 25px; border-radius: 12px; margin-bottom: 25px; display: flex; align-items: center; gap: 15px; box-shadow: 0 8px 20px rgba(255, 185, 0, 0.3);">
+            <div style="font-size: 1.5rem;">🏆</div>
+            <div>
+                <h4 style="margin-bottom: 2px; color: #723b13;">Season 1 - Complete</h4>
+                <p style="font-size: 0.9rem; color: #8b5a2b; margin: 0; font-weight: 600;">
+                    Champion: <strong>Christo shaju</strong> • This season has concluded.
+                </p>
+            </div>
+        </div>
+        {% endif %}
 
         <!-- Key Metrics -->
         <div class="kpi-grid">

@@ -2,7 +2,8 @@
 
 let leagueData = {
     season1: { teams: [], fixtures: [] },
-    season2: { teams: [], fixtures: [] }
+    season2: { teams: [], fixtures: [] },
+    season3: { teams: [], fixtures: [] }
 };
 
 if (window.leagueDataBackend) {
@@ -46,11 +47,15 @@ if (window.leagueDataBackend) {
         leagueData.season2.teams = processTeams(backendData.season2.teams);
         leagueData.season2.fixtures = processFixtures(backendData.season2.fixtures);
     }
+    if (backendData.season3) {
+        leagueData.season3.teams = processTeams(backendData.season3.teams);
+        leagueData.season3.fixtures = processFixtures(backendData.season3.fixtures);
+    }
 } else {
     console.error("No backend data found! Check window.leagueDataBackend");
 }
 
-let currentSeason = 'season2';
+let currentSeason = 'season3';
 
 // --- LOGIC FUNCTIONS ---
 
@@ -67,7 +72,10 @@ const getSortedTeams = (season) => {
 
 // Render Points Table
 const renderPointsTable = (season) => {
-    const targetId = season === 'season2' ? 'points-table-body-s2' : 'points-table-body';
+    let targetId = 'points-table-body';
+    if (season === 'season2') targetId = 'points-table-body-s2';
+    if (season === 'season3') targetId = 'points-table-body-s3';
+
     const tableBody = document.getElementById(targetId);
     if (!tableBody) return;
 
@@ -82,7 +90,7 @@ const renderPointsTable = (season) => {
     teams.forEach((team, index) => {
         const row = document.createElement('tr');
 
-        // Highlight logic (Season 2 only)
+        // Highlight logic (Season 2 only for now, can extend to S3 if rules same)
         if (season === 'season2') {
             if (index === 0) row.classList.add('row-final');
             else if (index === 1 || index === 2) row.classList.add('row-semi');
@@ -114,7 +122,10 @@ const renderPointsTable = (season) => {
 
 // Render Fixtures
 const renderFixtures = (season) => {
-    const targetId = season === 'season2' ? 'fixtures-list-s2' : 'fixtures-list';
+    let targetId = 'fixtures-list';
+    if (season === 'season2') targetId = 'fixtures-list-s2';
+    if (season === 'season3') targetId = 'fixtures-list-s3';
+
     const container = document.getElementById(targetId);
     if (!container) return;
 
@@ -170,7 +181,10 @@ const renderFixtures = (season) => {
 
 // Render Scorers
 const renderScorers = (season) => {
-    const targetId = season === 'season2' ? 'top-scorers-list-s2' : 'top-scorers-list';
+    let targetId = 'top-scorers-list';
+    if (season === 'season2') targetId = 'top-scorers-list-s2';
+    if (season === 'season3') targetId = 'top-scorers-list-s3';
+
     const container = document.getElementById(targetId);
     if (!container) return;
 
@@ -208,6 +222,10 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("Initializing App...");
 
     // 1. Render All Data
+    renderPointsTable('season3');
+    renderFixtures('season3');
+    renderScorers('season3');
+
     renderPointsTable('season2');
     renderFixtures('season2');
     renderScorers('season2');
@@ -221,6 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const navBtns = document.querySelectorAll('.nav-button');
     const s1Data = document.getElementById('season1-data');
     const s2Data = document.getElementById('season2-data');
+    const s3Data = document.getElementById('season3-data');
 
     // Handle Season Switch
     seasonBtns.forEach(btn => {
@@ -232,13 +251,15 @@ document.addEventListener('DOMContentLoaded', () => {
             // Logic
             currentSeason = btn.dataset.season;
 
-            if (currentSeason === 'season1') {
-                s1Data.classList.remove('hidden');
-                s2Data.classList.add('hidden');
-            } else {
-                s1Data.classList.add('hidden');
-                s2Data.classList.remove('hidden');
-            }
+            // Hide all
+            if (s1Data) s1Data.classList.add('hidden');
+            if (s2Data) s2Data.classList.add('hidden');
+            if (s3Data) s3Data.classList.add('hidden');
+
+            // Show current
+            if (currentSeason === 'season1' && s1Data) s1Data.classList.remove('hidden');
+            else if (currentSeason === 'season2' && s2Data) s2Data.classList.remove('hidden');
+            else if (currentSeason === 'season3' && s3Data) s3Data.classList.remove('hidden');
 
             // Reset to Table view when switching season
             navBtns[0].click();
@@ -254,15 +275,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Logic
             const targetBase = btn.dataset.target; // e.g. "points-table-section"
-            const container = currentSeason === 'season1' ? s1Data : s2Data;
+
+            let container;
+            if (currentSeason === 'season1') container = s1Data;
+            else if (currentSeason === 'season2') container = s2Data;
+            else container = s3Data;
+
+            if (!container) return;
 
             // Hide all sections in current container
             container.querySelectorAll('.content-section').forEach(sec => sec.classList.add('hidden'));
 
-            // Construct specific ID based on convention: generic-id + "-s1" or "-s2"
-            // My HTML IDs are: points-table-section-s2, fixtures-section-s2
-            // data-target is: "points-table-section"
-            const suffix = currentSeason === 'season1' ? '-s1' : '-s2';
+            // Construct specific ID based on convention: generic-id + "-s1", "-s2", or "-s3"
+            let suffix = '-s1';
+            if (currentSeason === 'season2') suffix = '-s2';
+            if (currentSeason === 'season3') suffix = '-s3';
+
             const specificId = targetBase + suffix;
 
             const targetSection = document.getElementById(specificId);
